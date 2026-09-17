@@ -6,11 +6,13 @@ import 'package:news_app/utils/constants.dart';
 class NewsController extends GetxController {
   final NewsService _newsService = NewsService();
 
+  // Observable variables
   final _isLoading = false.obs;
   final _articles = <NewsArticle>[].obs;
   final _selectedCategory = 'general'.obs;
   final _error = ''.obs;
 
+  // Getters
   bool get isLoading => _isLoading.value;
   List<NewsArticle> get articles => _articles;
   String get selectedCategory => _selectedCategory.value;
@@ -27,20 +29,27 @@ class NewsController extends GetxController {
     try {
       _isLoading.value = true;
       _error.value = '';
+
       final response = await _newsService.getTopHeadlines(
         category: category ?? _selectedCategory.value,
       );
+
       _articles.value = response.articles;
     } catch (e) {
       _error.value = e.toString();
-      Get.snackbar('Error', 'Failed to load news: ${e.toString()}',
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        'Error',
+        'Failed to load news: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } finally {
       _isLoading.value = false;
     }
   }
 
-  Future<void> refreshNews() async => fetchTopHeadlines();
+  Future<void> refreshNews() async {
+    await fetchTopHeadlines();
+  }
 
   void selectCategory(String category) {
     if (_selectedCategory.value != category) {
@@ -51,15 +60,20 @@ class NewsController extends GetxController {
 
   Future<void> searchNews(String query) async {
     if (query.isEmpty) return;
+
     try {
       _isLoading.value = true;
       _error.value = '';
+
       final response = await _newsService.searchNews(query: query);
       _articles.value = response.articles;
     } catch (e) {
       _error.value = e.toString();
-      Get.snackbar('Error', 'Failed to search news: ${e.toString()}',
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        'Error',
+        'Failed to search news: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } finally {
       _isLoading.value = false;
     }
