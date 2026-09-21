@@ -99,4 +99,90 @@ void main() {
       ]);
     });
   });
+
+  group('ArticleMapper removed-article filtering', () {
+    test('drops a record whose title is the [Removed] placeholder', () {
+      expect(
+        ArticleMapper.toEntity(
+          const ArticleDto(
+            title: '[Removed]',
+            url: 'https://example.com/a',
+            content: '[Removed]',
+          ),
+        ),
+        isNull,
+      );
+    });
+
+    test('drops a record pointing at removed.com', () {
+      expect(
+        ArticleMapper.toEntity(
+          const ArticleDto(title: 'Looks fine', url: 'https://removed.com'),
+        ),
+        isNull,
+      );
+    });
+
+    test('keeps a record that merely mentions the word removed', () {
+      expect(
+        ArticleMapper.toEntity(
+          const ArticleDto(
+            title: 'Statue removed from the square',
+            url: 'https://example.com/statue',
+          ),
+        ),
+        isNotNull,
+      );
+    });
+  });
+
+  group('ArticleMapper.canonicalizeUrl', () {
+    test('lowercases scheme and host and drops the fragment', () {
+      expect(
+        ArticleMapper.canonicalizeUrl('HTTPS://Example.COM/News/1#top'),
+        'https://example.com/News/1',
+      );
+    });
+
+    test('strips tracking parameters but keeps meaningful ones', () {
+      expect(
+        ArticleMapper.canonicalizeUrl(
+          'https://example.com/a?id=7&utm_source=news&fbclid=abc',
+        ),
+        'https://example.com/a?id=7',
+      );
+    });
+
+    test('strips a trailing slash', () {
+      expect(
+        ArticleMapper.canonicalizeUrl('https://example.com/a/'),
+        'https://example.com/a',
+      );
+    });
+
+    test('rejects a relative or non-http URL', () {
+      expect(ArticleMapper.canonicalizeUrl('/relative/path'), isNull);
+      expect(ArticleMapper.canonicalizeUrl('ftp://example.com/a'), isNull);
+      expect(ArticleMapper.canonicalizeUrl('not a url at all'), isNull);
+    });
+  });
+
+  group('ArticleMapper deduplication', () {
+    test('collapses records that share a canonical URL, first wins', () {
+      final List<Article> articles =
+          ArticleMapper.toEntities(const <ArticleDto>[
+            ArticleDto(title: 'Original', url: 'https://example.com/a'),
+            ArticleDto(
+              title: 'Syndicated copy',
+              url: 'https://EXAMPLE.com/a/?utm_campaign=x#top',
+            ),
+            ArticleDto(title: 'Different', url: 'https://example.com/b'),
+          ]);
+
+      expect(articles.map((Article a) => a.title), <String>[
+        'Original',
+        'Different',
+      ]);
+    });
+  });
 }

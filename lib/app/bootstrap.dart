@@ -3,11 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:news_app/app/di/providers.dart';
 import 'package:news_app/core/config/app_config.dart';
+import 'package:news_app/core/persistence/app_database.dart';
+import 'package:news_app/core/persistence/database_connection.dart';
+import 'package:news_app/core/persistence/settings_store.dart';
 
 /// Outcome of application start-up.
 ///
-/// Configuration is validated before any widget is built, so a misconfigured
-/// build shows an actionable screen instead of failing mid-render.
+/// Configuration is validated and storage is opened before any widget is
+/// built, so a misconfigured build shows an actionable screen instead of
+/// failing mid-render.
 @immutable
 sealed class BootstrapResult {
   const BootstrapResult();
@@ -31,17 +35,23 @@ final class BootstrapFailure extends BootstrapResult {
 /// graph is constructed.
 ///
 /// Everything expensive or asynchronous belongs here — not in a widget, and
-/// not in a controller. Local persistence is opened here once it lands, which
-/// is why this returns a `Future` even though it currently has no await.
+/// not in a controller.
 Future<BootstrapResult> bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  final AppConfig config;
   try {
-    final AppConfig config = AppConfig.fromEnvironment();
-    return BootstrapSuccess(<Override>[
-      appConfigProvider.overrideWithValue(config),
-    ]);
+    config = AppConfig.fromEnvironment();
   } on ConfigurationError catch (error) {
     return BootstrapFailure(error);
   }
+
+  final AppDatabase database = AppDatabase(openAppDatabaseFile());
+  final SettingsStore settings = await SettingsStore.open();
+
+  return BootstrapSuccess(<Override>[
+    appConfigProvider.overrideWithValue(config),
+    appDatabaseProvider.overrideWithValue(database),
+    settingsStoreProvider.overrideWithValue(settings),
+  ]);
 }

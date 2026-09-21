@@ -1,3 +1,4 @@
+import 'package:news_app/features/news/domain/entities/article.dart';
 import 'package:news_app/features/news/domain/entities/article_feed.dart';
 import 'package:news_app/features/news/domain/entities/news_category.dart';
 
@@ -23,5 +24,16 @@ abstract interface class NewsRepository {
   });
 
   /// One page of search results for [query]. [page] is 1-based.
+  ///
+  /// Search results are not cached, so this always reaches the active source.
   Future<ArticleFeed> searchArticles({required String query, int page});
+
+  /// The stored article for a canonical [url], or `null` when it was never
+  /// cached. Backs screens reached by deep link, where no object was passed.
+  Future<Article?> findCachedArticle(String url);
+
+  /// Drops every cached feed. Bookmarked articles are retained.
+  ///
+  /// Throws `CacheFailure` when local storage cannot be cleared.
+  Future<void> clearCache();
 }

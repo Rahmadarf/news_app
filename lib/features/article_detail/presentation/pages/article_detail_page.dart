@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:news_app/core/theme/app_colors.dart';
 import 'package:news_app/core/widgets/status_views.dart';
+import 'package:news_app/features/article_detail/presentation/controllers/cached_article_provider.dart';
 import 'package:news_app/features/news/domain/entities/article.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -12,41 +14,82 @@ import 'package:url_launcher/url_launcher.dart';
 ///
 /// [article] is the fast path handed over by the list. It is absent after a
 /// deep link, a hot restart, or a browser reload, which is why [articleUrl] is
-/// also carried in the route. Nothing here casts a route argument; a missing
-/// article renders an explanatory state instead of crashing. See
+/// also carried in the route. Nothing here casts a route argument; when no
+/// object arrives the screen looks the article up in the local cache, and
+/// falls back to an explanatory state rather than crashing. See
 /// docs/AUDIT.md H-10.
-///
-/// Part 4 replaces the "unavailable" branch with a cache lookup by URL.
-class ArticleDetailPage extends StatelessWidget {
+class ArticleDetailPage extends ConsumerWidget {
   const ArticleDetailPage({super.key, this.article, this.articleUrl});
 
   final Article? article;
   final String? articleUrl;
 
   @override
-  Widget build(BuildContext context) {
-    final Article? article = this.article;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final Article? handedOver = article;
+    if (handedOver != null) return _Reader(article: handedOver);
 
-    if (article == null) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Article')),
-        body: EmptyView(
-          icon: Icons.article_outlined,
-          title: 'Article not loaded',
-          message: articleUrl == null
-              ? 'This link does not point at an article.'
-              : 'Open it from the feed, or read it on the web.',
-        ),
-        floatingActionButton: articleUrl == null
-            ? null
-            : FloatingActionButton.extended(
-                onPressed: () => _openInBrowser(context, articleUrl!),
-                icon: const Icon(Icons.open_in_browser),
-                label: const Text('Open in browser'),
-              ),
+    final String? url = articleUrl;
+    if (url == null) {
+      return const _Unavailable(
+        message: 'This link does not point at an article.',
       );
     }
 
+    return ref
+        .watch(cachedArticleProvider(url))
+        .when(
+          loading: () =>
+              const Scaffold(body: Center(child: CircularProgressIndicator())),
+          error: (Object error, StackTrace stackTrace) => _Unavailable(
+            articleUrl: url,
+            message: 'This article could not be loaded from storage.',
+          ),
+          data: (Article? cached) => cached != null
+              ? _Reader(article: cached)
+              : _Unavailable(
+                  articleUrl: url,
+                  message: 'Open it from the feed, or read it on the web.',
+                ),
+        );
+  }
+}
+
+class _Unavailable extends StatelessWidget {
+  const _Unavailable({required this.message, this.articleUrl});
+
+  final String message;
+  final String? articleUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    final String? url = articleUrl;
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Article')),
+      body: EmptyView(
+        icon: Icons.article_outlined,
+        title: 'Article not loaded',
+        message: message,
+      ),
+      floatingActionButton: url == null
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: () => _openInBrowser(context, url),
+              icon: const Icon(Icons.open_in_browser),
+              label: const Text('Open in browser'),
+            ),
+    );
+  }
+}
+
+class _Reader extends StatelessWidget {
+  const _Reader({required this.article});
+
+  final Article article;
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[

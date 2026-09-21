@@ -11,6 +11,7 @@ class FakeNewsRemoteDataSource implements NewsRemoteDataSource {
     this.totalResults = 0,
     this.articlesPerPage = 0,
     this.includeInvalidRecord = false,
+    this.uniquePerPage = false,
     this.throwOnCall,
   });
 
@@ -22,6 +23,11 @@ class FakeNewsRemoteDataSource implements NewsRemoteDataSource {
 
   /// When true, each page also carries one record that the mapper must drop.
   final bool includeInvalidRecord;
+
+  /// When true, every page returns distinct URLs. When false — the default —
+  /// each page repeats the same URLs, which is what exercises cross-page
+  /// deduplication.
+  final bool uniquePerPage;
 
   /// Thrown instead of returning, to exercise failure mapping. Mutable so a
   /// test can make a source start failing partway through.
@@ -43,7 +49,7 @@ class FakeNewsRemoteDataSource implements NewsRemoteDataSource {
     headlineCallCount++;
     lastCategory = category;
     lastPage = page;
-    return _respond();
+    return _respond(page);
   }
 
   @override
@@ -55,18 +61,20 @@ class FakeNewsRemoteDataSource implements NewsRemoteDataSource {
     searchCallCount++;
     lastQuery = query;
     lastPage = page;
-    return _respond();
+    return _respond(page);
   }
 
-  NewsResponseDto _respond() {
+  NewsResponseDto _respond(int page) {
     final Object? error = throwOnCall;
     if (error != null) throw error;
+
+    final String prefix = uniquePerPage ? 'p$page-' : '';
 
     final List<ArticleDto> articles = <ArticleDto>[
       for (int i = 0; i < articlesPerPage; i++)
         ArticleDto(
-          title: 'Fake headline ${i + 1}',
-          url: 'https://example.com/fake/${i + 1}',
+          title: 'Fake headline $prefix${i + 1}',
+          url: 'https://example.com/fake/$prefix${i + 1}',
           publishedAt: '2026-09-20T08:30:00Z',
           source: const SourceDto(id: 'fake', name: 'Fake Source'),
         ),

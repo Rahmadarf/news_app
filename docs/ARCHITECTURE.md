@@ -1,6 +1,6 @@
 # ARCHITECTURE — news_app
 
-Status: berlaku sejak Part 3 (fondasi arsitektur).
+Status: berlaku sejak Part 4 (fondasi data & domain).
 Pendamping: [`AUDIT.md`](AUDIT.md) memuat temuan yang memotivasi setiap keputusan
 di sini.
 
@@ -14,11 +14,19 @@ di sini.
 | Navigasi | **go_router 17** | Rute bertipe, deep link, argumen rute dapat diperiksa tanpa cast |
 | Model | **Tulis tangan** + `sealed class` Dart 3 | Hanya ~4 DTO; sealed class native sudah cukup untuk failure dan state union |
 | HTTP | **`package:http`** + `Client` yang diinjeksi | Timeout eksplisit, `MockClient` untuk test, nol dependensi baru |
-| Persistence | **Drift** (belum dipasang) | Dijadwalkan untuk Part 4; lihat §7 |
-| Codegen | Belum ada | `build_runner` baru masuk bersama Drift |
+| Persistence | **Drift** (SQLite) | Query bertipe, migrasi first-class, dedup lewat primary key URL |
+| Settings skalar | **`shared_preferences`** | Toggle tidak perlu migrasi skema |
+| Waktu | **`clock`** | `Clock` yang diinjeksi membuat TTL dapat diuji tanpa delay nyata |
+| Codegen | `build_runner` + `drift_dev` | Satu-satunya konsumen codegen adalah Drift |
 
 Dependensi yang dihapus: `get` (GetX), `flutter_dotenv`.
-Dependensi yang ditambah: `flutter_riverpod`, `go_router`, `fake_async` (dev).
+Dependensi yang ditambah: `flutter_riverpod`, `go_router`, `drift`, `sqlite3`,
+`path_provider`, `path`, `shared_preferences`, `clock`; dev: `drift_dev`,
+`build_runner`, `fake_async`.
+
+Catatan: `sqlite3_flutter_libs` **tidak** dipakai — paket itu sudah EOL
+("Not used anymore, update to version 3.x of package:sqlite3 instead") dan
+`sqlite3` 3.x mengirimkan native library-nya sendiri lewat build hook.
 
 ---
 
@@ -38,12 +46,13 @@ lib/
   core/
     config/app_config.dart      # String.fromEnvironment + validasi
     errors/failure.dart         # hierarki Failure bertipe
+    persistence/                # AppDatabase (Drift), koneksi, SettingsStore
     theme/                      # AppColors, AppTheme
     widgets/status_views.dart   # FailureView, EmptyView, describeFailure
   features/
     news/
       data/
-        datasources/            # NewsRemoteDataSource + Api + Mock
+        datasources/            # NewsRemoteDataSource + Api + Mock + Local
         dto/                    # ArticleDto, NewsResponseDto
         mappers/                # ArticleMapper
         repositories/           # NewsRepositoryImpl
@@ -58,7 +67,11 @@ lib/
     search/
       presentation/             # SearchResultsController, SearchState, SearchResultsPage, SearchDialog
     article_detail/
-      presentation/pages/       # ArticleDetailPage
+      presentation/
+        controllers/            # cachedArticleProvider
+        pages/                  # ArticleDetailPage
+assets/
+  fixtures/                     # top_headlines.json, search.json (mode mock)
 test/
   app_smoke_test.dart
   core/config/
@@ -123,8 +136,9 @@ Aturan yang ditegakkan:
 - `BootstrapFailure(error)` — konfigurasi tidak terpakai; `ConfigurationErrorApp`
   ditampilkan dengan pesan dan perintah perbaikannya.
 
-`bootstrap()` adalah `Future` meskipun saat ini tidak ada `await`, karena Part 4
-membuka database Drift di sini.
+`bootstrap()` membuka database Drift dan `SharedPreferences` sebelum frame
+pertama. Itulah alasan ia asinkron, dan itulah satu-satunya tempat kedua sumber
+daya tersebut dikonstruksi.
 
 Sumber data dipilih **satu kali** di `newsRemoteDataSourceProvider`, dari
 `AppConfig.dataSourceMode`. Tidak ada kode lain yang boleh memilih sumber data.
@@ -185,38 +199,91 @@ berdasarkan URL.
 
 ---
 
-## 7. Yang belum ada, dan di mana tempatnya nanti
+## 7. Persistence dan kebijakan cache
 
-Struktur berikut **belum dibuat**. Didokumentasikan agar tidak ada direktori
-kosong yang di-scaffold lebih awal:
+### Skema (schemaVersion 1)
 
-```text
-lib/
-  core/
-    persistence/          # Drift database, DAO, migrasi          → Part 4
-    utils/                # clock yang diinjeksi untuk TTL         → Part 4
-  features/
-    news/data/
-      datasources/news_local_data_source.dart                      → Part 4
-      fixtures/                                                    → Part 4
-    bookmarks/            # domain + data + presentation           → prompt desain
-    history/                                                       → prompt desain
-    settings/                                                      → prompt desain
-```
+| Tabel | Isi | Dipakai sekarang |
+|---|---|---|
+| `cached_articles` | satu baris per artikel, PK = URL kanonik | ya |
+| `feed_entries` | keanggotaan berurutan artikel pada satu halaman feed | ya |
+| `feed_page_metadata` | `fetchedAt`, `totalResults`, `hasMore` per halaman | ya |
+| `bookmarks` | groundwork, belum ada UI | tidak |
+| `reading_history_entries` | groundwork, belum ada UI | tidak |
+| `recent_searches` | groundwork, belum ada UI | tidak |
 
-Perilaku yang sengaja belum ada pada Part 3:
+Tiga tabel terakhir sengaja dibuat sekarang supaya fitur bookmark, riwayat, dan
+pencarian terakhir dapat ditambahkan tanpa migrasi skema. Nol kode menulis ke
+sana.
 
-- Cache lokal, TTL, fallback stale saat offline. `ArticleFeed.origin` selalu
-  `DataOrigin.network`; nilai `cache`/`staleCache` sudah dapat direpresentasikan
-  oleh state dan sudah punya banner di UI, tetapi belum pernah dihasilkan.
-- Filter `"[Removed]"`, kanonikalisasi URL, dan dedup lintas halaman di lapisan
-  mapping. Dedup saat ini dilakukan controller saat menggabungkan halaman.
-- Fixture JSON yang di-commit untuk mock data source.
-- Pembatalan request saat kategori berganti dengan cepat.
+`cached_articles` ber-PK URL kanonik, sehingga deduplikasi menjadi jaminan
+penyimpanan, bukan konvensi.
+
+### Cache key
+
+`headlines:<country>:<category>`, satu entri per halaman. Kategori dan negara
+adalah identitas feed; halaman adalah unit TTL.
+
+### Kebijakan
+
+| Perilaku | Aturan |
+|---|---|
+| TTL | 15 menit (`kFeedCacheTtl`). Halaman yang lebih muda disajikan dari storage, **nol request** |
+| Refresh | `forceRefresh: true` mengabaikan TTL, menghapus seluruh halaman feed itu, lalu meminta halaman 1 |
+| Offline | Hanya `NoConnectionFailure` dan `TimeoutFailure` jatuh ke cache basi, dilaporkan `DataOrigin.staleCache`. Nol cache + offline = failure dilempar |
+| Kegagalan lain | `401`, `429`, body rusak — **tidak** disembunyikan di balik data lama |
+| Dedup antar halaman | Halaman N membuang URL kanonik yang sudah tersimpan di halaman 1..N-1 feed yang sama |
+| `hasMore` | Diturunkan dari `totalResults` mentah, bukan dari daftar hasil filter, agar pembuangan record rusak tidak menghentikan paginasi lebih awal |
+| Clear | `NewsRepository.clearCache()` mengosongkan feed; artikel yang di-bookmark dipertahankan |
+
+**Search tidak di-cache.** Cache pencarian tumbuh tanpa batas melintasi query
+yang berbeda, dan hasil pencarian basi lebih menyesatkan daripada headline basi
+karena user baru saja menyatakan niat yang segar.
+
+### Kegagalan storage
+
+Baca yang gagal diperlakukan sebagai "tidak ada cache"; tulis bersifat
+best-effort. Masalah penyimpanan tidak boleh mengubah request jaringan yang
+berhasil menjadi error. Satu-satunya `CacheFailure` yang sampai ke pemanggil
+berasal dari `clearCache()`.
+
+### Kanonikalisasi URL
+
+`ArticleMapper.canonicalizeUrl` menurunkan scheme dan host ke huruf kecil,
+membuang fragment, membuang parameter pelacak (`utm_*`, `fbclid`, `gclid`,
+`mc_cid`, `mc_eid`), dan memotong trailing slash. Nilai non-http(s) ditolak.
+Hasilnya adalah kunci identitas untuk entitas, dedup, dan lookup cache.
+
+### Filter di lapisan mapping
+
+Record dibuang bila: tombstone `"[Removed]"` NewsAPI (judul/konten, atau host
+`removed.com`), tidak ada URL, tidak ada judul. `publishedAt` diparsing dengan
+`tryParse`; timestamp rusak menjadi `null`, bukan exception.
 
 ---
 
-## 8. Kontrak untuk pekerjaan berikutnya
+## 8. Yang belum ada
+
+Struktur berikut **belum dibuat**, didokumentasikan agar nol direktori kosong
+di-scaffold lebih awal:
+
+```text
+lib/features/
+  bookmarks/     # domain + data + presentation  → prompt desain
+  history/                                        → prompt desain
+  settings/                                       → prompt desain
+```
+
+Perilaku yang sengaja belum ada:
+
+- Pembatalan request saat kategori berganti cepat. Generasi request atau
+  `CancelToken` adalah jalur yang direncanakan.
+- Penghapusan cache berbasis usia atau ukuran. Hanya `clearCache()` manual.
+- Persistensi settings selain kategori terpilih.
+
+---
+
+## 9. Kontrak untuk pekerjaan berikutnya
 
 Yang boleh diandalkan oleh Part 4 dan prompt desain:
 
@@ -225,15 +292,31 @@ Yang boleh diandalkan oleh Part 4 dan prompt desain:
 ```dart
 Future<ArticleFeed> getTopHeadlines({
   required NewsCategory category,
-  int page,
-  bool forceRefresh,
+  int page,            // 1-based
+  bool forceRefresh,   // abaikan TTL, buang halaman lama, minta halaman 1
 });
 
 Future<ArticleFeed> searchArticles({required String query, int page});
+
+Future<Article?> findCachedArticle(String url);  // null bila belum pernah di-cache
+Future<void> clearCache();                       // lempar CacheFailure
 ```
 
-Setiap metode selesai dengan `ArticleFeed`, atau melempar `Failure` bertipe.
-Tidak ada exception transport yang bocor, tidak ada DTO yang muncul.
+Setiap metode selesai dengan hasilnya, atau melempar `Failure` bertipe. Nol
+exception transport bocor, nol DTO muncul.
+
+`ArticleFeed` membawa `articles`, `page`, `hasMore`, `totalResults`, `origin`
+(`network` / `cache` / `staleCache`), dan `fetchedAt`.
+
+**Entitas** — `Article` menjamin `url`, `title`, dan `source` non-null.
+`description`, `imageUrl`, `publishedAt`, dan `content` opsional. Identitas dan
+`==` berbasis `url` kanonik.
+
+**Failure** — sealed, 10 varian: `ConfigurationFailure`, `NoConnectionFailure`,
+`TimeoutFailure`, `UnauthorizedFailure`, `RateLimitedFailure`,
+`UpgradeRequiredFailure`, `ServerFailure`, `MalformedResponseFailure`,
+`CacheFailure`, `UnknownFailure`. Copy UI dipetakan di
+`core/widgets/status_views.dart` lewat `describeFailure`, bukan di lapisan data.
 
 **State** — `NewsFeedState`, `SearchState` (sealed, immutable, `copyWith` pada
 varian `Ready`).

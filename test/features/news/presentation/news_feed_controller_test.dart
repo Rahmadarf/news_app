@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:news_app/app/di/providers.dart';
 import 'package:news_app/core/errors/failure.dart';
+import 'package:news_app/features/news/data/datasources/news_local_data_source.dart';
 import 'package:news_app/features/news/data/repositories/news_repository_impl.dart';
 import 'package:news_app/features/news/domain/entities/news_category.dart';
 import 'package:news_app/features/news/presentation/controllers/news_feed_controller.dart';
@@ -11,13 +12,18 @@ import 'package:news_app/features/search/presentation/controllers/search_control
 import 'package:news_app/features/search/presentation/state/search_state.dart';
 
 import '../../../support/fake_news_remote_data_source.dart';
+import '../../../support/test_database.dart';
 
 void main() {
   ProviderContainer containerWith(FakeNewsRemoteDataSource remote) {
     return ProviderContainer.test(
       overrides: <Override>[
         newsRepositoryProvider.overrideWithValue(
-          NewsRepositoryImpl(remote: remote, pageSize: 5),
+          NewsRepositoryImpl(
+            remote: remote,
+            local: NewsLocalDataSource(newTestDatabase()),
+            pageSize: 5,
+          ),
         ),
       ],
     );

@@ -6,8 +6,9 @@ pengerasan dari prototipe tutorial menjadi fondasi yang dapat dirawat.
 - Audit dan temuan: [`docs/AUDIT.md`](docs/AUDIT.md)
 - Arsitektur yang berlaku: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 
-Stack: Flutter + Riverpod (state & DI) + go_router (navigasi) + `package:http`.
-Struktur feature-first; lihat dokumen arsitektur untuk aliran dependensinya.
+Stack: Flutter + Riverpod (state & DI) + go_router (navigasi) + `package:http`
++ Drift (cache lokal). Struktur feature-first; lihat dokumen arsitektur untuk
+aliran dependensi dan kebijakan cache.
 
 ## Prasyarat
 
@@ -17,6 +18,13 @@ Struktur feature-first; lihat dokumen arsitektur untuk aliran dependensinya.
 
 ```bash
 flutter pub get
+```
+
+Kode Drift sudah di-commit, jadi clone bersih tidak perlu menjalankan codegen.
+Jalankan ini hanya setelah mengubah tabel di `lib/core/persistence/`:
+
+```bash
+flutter pub run build_runner build
 ```
 
 ## Menjalankan aplikasi
@@ -83,14 +91,24 @@ Batasan lain yang perlu diketahui: plan Developer NewsAPI membatasi kuota harian
 dan memblokir request dari aplikasi produksi. Mode mock ada justru supaya
 pengembangan dan demo sehari-hari tidak menghabiskan kuota tersebut.
 
+## Cache lokal
+
+Headline di-cache di SQLite per `country:category` dan per halaman, dengan TTL
+15 menit. Saat offline, halaman tersimpan tetap ditampilkan dan ditandai basi.
+Hasil pencarian **tidak** di-cache — alasannya ada di
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+Pull-to-refresh mengabaikan TTL dan meminta ulang halaman pertama.
+
 ## Test
 
 ```bash
 flutter test
 ```
 
-Test tidak pernah menyentuh jaringan. Mode mock adalah default, sehingga
-`flutter test` berjalan tanpa konfigurasi apa pun.
+Test tidak pernah menyentuh jaringan: sumber live diuji lewat `MockClient` dari
+`package:http/testing.dart`, database memakai SQLite in-memory, dan perilaku TTL
+diuji dengan `Clock` yang dimajukan manual — nol delay nyata.
 
 ## Pemeriksaan kualitas
 
