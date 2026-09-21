@@ -5,7 +5,7 @@ class NewsResponse {
   final int totalResults;
   final List<NewsArticle> articles;
 
-  NewsResponse({
+  const NewsResponse({
     required this.status,
     required this.totalResults,
     required this.articles,

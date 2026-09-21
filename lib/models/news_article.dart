@@ -7,7 +7,7 @@ class NewsArticle {
   final String? content;
   final Source? source;
 
-  NewsArticle({
+  const NewsArticle({
     this.title,
     this.description,
     this.url,
@@ -46,7 +46,7 @@ class Source {
   final String? id;
   final String? name;
 
-  Source({this.id, this.name});
+  const Source({this.id, this.name});
 
   factory Source.fromJson(Map<String, dynamic> json) {
     return Source(id: json['id'], name: json['name']);
