@@ -1,0 +1,370 @@
+{
+  "status": "ok",
+  "totalResults": 28,
+  "articles": [
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 1",
+      "title": "Mock general headline 1",
+      "description": "Sample description for general item 1.",
+      "url": "https://example.com/general/1",
+      "urlToImage": "https://example.com/general/1.jpg",
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for general item 1. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 2",
+      "title": "Mock general headline 2",
+      "description": "Sample description for general item 2.",
+      "url": "https://example.com/general/2",
+      "urlToImage": null,
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for general item 2. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 3",
+      "title": "Mock general headline 3",
+      "description": "Sample description for general item 3.",
+      "url": "https://example.com/general/3",
+      "urlToImage": "https://example.com/general/3.jpg",
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for general item 3. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": null,
+        "name": null
+      },
+      "author": null,
+      "title": "[Removed]",
+      "description": "[Removed]",
+      "url": "https://removed.com",
+      "urlToImage": null,
+      "publishedAt": "1970-01-01T00:00:00Z",
+      "content": "[Removed]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 4",
+      "title": "Mock general headline 4",
+      "description": "Sample description for general item 4.",
+      "url": "https://example.com/general/4",
+      "urlToImage": null,
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for general item 4. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 5",
+      "title": "Mock general headline 5",
+      "description": "Sample description for general item 5.",
+      "url": "https://example.com/general/5",
+      "urlToImage": "https://example.com/general/5.jpg",
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for general item 5. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 6",
+      "title": "Mock general headline 6",
+      "description": "Sample description for general item 6.",
+      "url": "https://example.com/general/6",
+      "urlToImage": null,
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for general item 6. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": null,
+        "name": "No Title Wire"
+      },
+      "author": null,
+      "title": null,
+      "description": "A record with no title at all.",
+      "url": "https://example.com/general/no-title",
+      "urlToImage": null,
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": null
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 7",
+      "title": "Mock general headline 7",
+      "description": "Sample description for general item 7.",
+      "url": "https://example.com/general/7",
+      "urlToImage": "https://example.com/general/7.jpg",
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for general item 7. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": null,
+        "name": "No Url Wire"
+      },
+      "author": null,
+      "title": "A record with no URL at all",
+      "description": null,
+      "url": null,
+      "urlToImage": null,
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": null
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 8",
+      "title": "Mock general headline 8",
+      "description": "Sample description for general item 8.",
+      "url": "https://example.com/general/8",
+      "urlToImage": null,
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for general item 8. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 1",
+      "title": "Mock general headline 1 (syndicated copy)",
+      "description": "Same canonical URL as item 1.",
+      "url": "https://EXAMPLE.com/general/1/?utm_source=newsletter&utm_campaign=x#top",
+      "urlToImage": null,
+      "publishedAt": "2026-09-20T09:00:00Z",
+      "content": null
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 9",
+      "title": "Mock general headline 9",
+      "description": "Sample description for general item 9.",
+      "url": "https://example.com/general/9",
+      "urlToImage": "https://example.com/general/9.jpg",
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for general item 9. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": null,
+      "title": "Mock general headline with a broken date",
+      "description": "publishedAt is not ISO-8601.",
+      "url": "https://example.com/general/broken-date",
+      "urlToImage": null,
+      "publishedAt": "yesterday afternoon",
+      "content": null
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 10",
+      "title": "Mock general headline 10",
+      "description": "Sample description for general item 10.",
+      "url": "https://example.com/general/10",
+      "urlToImage": null,
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for general item 10. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 11",
+      "title": "Mock general headline 11",
+      "description": "Sample description for general item 11.",
+      "url": "https://example.com/general/11",
+      "urlToImage": "https://example.com/general/11.jpg",
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for general item 11. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 12",
+      "title": "Mock general headline 12",
+      "description": "Sample description for general item 12.",
+      "url": "https://example.com/general/12",
+      "urlToImage": null,
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for general item 12. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 13",
+      "title": "Mock general headline 13",
+      "description": "Sample description for general item 13.",
+      "url": "https://example.com/general/13",
+      "urlToImage": "https://example.com/general/13.jpg",
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for general item 13. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 14",
+      "title": "Mock general headline 14",
+      "description": "Sample description for general item 14.",
+      "url": "https://example.com/general/14",
+      "urlToImage": null,
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for general item 14. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 15",
+      "title": "Mock general headline 15",
+      "description": "Sample description for general item 15.",
+      "url": "https://example.com/general/15",
+      "urlToImage": "https://example.com/general/15.jpg",
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for general item 15. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 16",
+      "title": "Mock general headline 16",
+      "description": "Sample description for general item 16.",
+      "url": "https://example.com/general/16",
+      "urlToImage": null,
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for general item 16. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 17",
+      "title": "Mock general headline 17",
+      "description": "Sample description for general item 17.",
+      "url": "https://example.com/general/17",
+      "urlToImage": "https://example.com/general/17.jpg",
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for general item 17. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 18",
+      "title": "Mock general headline 18",
+      "description": "Sample description for general item 18.",
+      "url": "https://example.com/general/18",
+      "urlToImage": null,
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for general item 18. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 19",
+      "title": "Mock general headline 19",
+      "description": "Sample description for general item 19.",
+      "url": "https://example.com/general/19",
+      "urlToImage": "https://example.com/general/19.jpg",
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for general item 19. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 20",
+      "title": "Mock general headline 20",
+      "description": "Sample description for general item 20.",
+      "url": "https://example.com/general/20",
+      "urlToImage": null,
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for general item 20. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 21",
+      "title": "Mock general headline 21",
+      "description": "Sample description for general item 21.",
+      "url": "https://example.com/general/21",
+      "urlToImage": "https://example.com/general/21.jpg",
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for general item 21. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 22",
+      "title": "Mock general headline 22",
+      "description": "Sample description for general item 22.",
+      "url": "https://example.com/general/22",
+      "urlToImage": null,
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for general item 22. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 23",
+      "title": "Mock general headline 23",
+      "description": "Sample description for general item 23.",
+      "url": "https://example.com/general/23",
+      "urlToImage": "https://example.com/general/23.jpg",
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for general item 23. [+1234 chars]"
+    }
+  ]
+}

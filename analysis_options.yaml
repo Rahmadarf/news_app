@@ -21,8 +21,13 @@ linter:
   # `// ignore_for_file: name_of_lint` syntax on the line or in the file
   # producing the lint.
   rules:
-    # avoid_print: false  # Uncomment to disable the `avoid_print` rule
-    # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
+    # Disabled deliberately. Dependencies are injected through *named*
+    # constructor parameters onto *private* fields, and Dart forbids a named
+    # initializing formal whose name starts with an underscore
+    # (`{required this._client}` is a compile error). Satisfying this rule
+    # would force either positional parameters or public dependency fields,
+    # both of which are worse for a DI-heavy codebase.
+    prefer_initializing_formals: false
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options

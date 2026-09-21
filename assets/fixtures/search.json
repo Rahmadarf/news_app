@@ -1,0 +1,97 @@
+{
+  "status": "ok",
+  "totalResults": 7,
+  "articles": [
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 1",
+      "title": "Mock search headline 1",
+      "description": "Sample description for search item 1.",
+      "url": "https://example.com/search/1",
+      "urlToImage": "https://example.com/search/1.jpg",
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for search item 1. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 2",
+      "title": "Mock search headline 2",
+      "description": "Sample description for search item 2.",
+      "url": "https://example.com/search/2",
+      "urlToImage": "https://example.com/search/2.jpg",
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for search item 2. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 3",
+      "title": "Mock search headline 3",
+      "description": "Sample description for search item 3.",
+      "url": "https://example.com/search/3",
+      "urlToImage": "https://example.com/search/3.jpg",
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for search item 3. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 4",
+      "title": "Mock search headline 4",
+      "description": "Sample description for search item 4.",
+      "url": "https://example.com/search/4",
+      "urlToImage": "https://example.com/search/4.jpg",
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for search item 4. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 5",
+      "title": "Mock search headline 5",
+      "description": "Sample description for search item 5.",
+      "url": "https://example.com/search/5",
+      "urlToImage": "https://example.com/search/5.jpg",
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for search item 5. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 6",
+      "title": "Mock search headline 6",
+      "description": "Sample description for search item 6.",
+      "url": "https://example.com/search/6",
+      "urlToImage": "https://example.com/search/6.jpg",
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for search item 6. [+1234 chars]"
+    },
+    {
+      "source": {
+        "id": "mock-source",
+        "name": "Mock Source"
+      },
+      "author": "Mock Author 7",
+      "title": "Mock search headline 7",
+      "description": "Sample description for search item 7.",
+      "url": "https://example.com/search/7",
+      "urlToImage": "https://example.com/search/7.jpg",
+      "publishedAt": "2026-09-20T08:30:00Z",
+      "content": "Mock content for search item 7. [+1234 chars]"
+    }
+  ]
+}
