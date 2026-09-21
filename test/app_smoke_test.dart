@@ -1,24 +1,33 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
-import 'package:news_app/main.dart';
-import 'package:news_app/services/mock_news_service.dart';
-import 'package:news_app/widgets/news_card.dart';
+import 'package:news_app/app/app.dart';
+import 'package:news_app/app/di/providers.dart';
+import 'package:news_app/core/config/app_config.dart';
+import 'package:news_app/features/news/presentation/widgets/article_card.dart';
 
 void main() {
-  tearDown(Get.reset);
-
-  testWidgets('app boots into the home feed backed by the mock data source', (
+  testWidgets('app boots into the headline feed backed by the mock source', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const MyApp(newsService: MockNewsService()));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: <Override>[
+          appConfigProvider.overrideWithValue(
+            AppConfig.from(rawMode: 'mock', rawApiKey: ''),
+          ),
+        ],
+        child: const NewsApp(),
+      ),
+    );
 
-    // First frame: bindings ran, the initial fetch is in flight.
+    // First frame shows the shimmer; the mock future resolves on the next turn.
     await tester.pump();
-    // Second pump settles the already-completed mock future.
     await tester.pump();
 
     expect(find.text('News App'), findsOneWidget);
-    expect(find.byType(NewsCard), findsWidgets);
+    expect(find.text('General'), findsOneWidget);
+    expect(find.byType(ArticleCard), findsWidgets);
     expect(find.text('Mock general headline 1'), findsOneWidget);
   });
 }

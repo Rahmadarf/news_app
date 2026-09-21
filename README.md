@@ -3,7 +3,11 @@
 Aplikasi berita Flutter berbasis NewsAPI. Repositori ini sedang dalam proses
 pengerasan dari prototipe tutorial menjadi fondasi yang dapat dirawat.
 
-- Audit dan keputusan arsitektur: [`docs/AUDIT.md`](docs/AUDIT.md)
+- Audit dan temuan: [`docs/AUDIT.md`](docs/AUDIT.md)
+- Arsitektur yang berlaku: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+
+Stack: Flutter + Riverpod (state & DI) + go_router (navigasi) + `package:http`.
+Struktur feature-first; lihat dokumen arsitektur untuk aliran dependensinya.
 
 ## Prasyarat
 
