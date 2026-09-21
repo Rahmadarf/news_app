@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:news_app/utils/app_colors.dart';
 
 class LoadingShimmer extends StatefulWidget {
+  const LoadingShimmer({super.key});
+
   @override
-  _LoadingShimmerState createState() => _LoadingShimmerState();
+  State<LoadingShimmer> createState() => _LoadingShimmerState();
 }
 
 class _LoadingShimmerState extends State<LoadingShimmer>
@@ -60,7 +62,7 @@ class _LoadingShimmerState extends State<LoadingShimmer>
                         end: Alignment.centerRight,
                         colors: [
                           AppColors.divider,
-                          AppColors.divider.withOpacity(0.5),
+                          AppColors.divider.withValues(alpha: 0.5),
                           AppColors.divider,
                         ],
                         stops: [0.0, 0.5, 1.0],

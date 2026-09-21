@@ -4,7 +4,9 @@ import 'package:news_app/services/news_service.dart';
 import 'package:news_app/utils/constants.dart';
 
 class NewsController extends GetxController {
-  final NewsService _newsService = NewsService();
+  NewsController(this._newsService);
+
+  final NewsService _newsService;
 
   // Observable variables
   final _isLoading = false.obs;

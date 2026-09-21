@@ -1,5 +1,5 @@
 name: news_app
-description: "A new Flutter project."
+description: "Aplikasi berita Flutter berbasis NewsAPI dengan mode data mock dan live."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -40,7 +40,6 @@ dependencies:
   share_plus: ^11.0.0            # Berbagi artikel ke aplikasi lain
   cached_network_image: ^3.4.1   # Cache gambar dari network
   timeago: ^3.7.1                # Format waktu "x menit lalu"
-  flutter_dotenv: ^5.2.1         # Membaca API key dari file .env
 
 dev_dependencies:
   flutter_test:
@@ -64,8 +63,8 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
-  assets:
-    - assets/.env
+  # Tidak ada file rahasia yang dibundel sebagai asset. Konfigurasi dibaca lewat
+  # --dart-define pada waktu kompilasi; lihat lib/core/config/app_config.dart.
 
   # To add assets to your application, add an assets section, like this:
   # assets:

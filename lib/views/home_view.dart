@@ -8,6 +8,8 @@ import 'package:news_app/widgets/category_chip.dart';
 import 'package:news_app/widgets/loading_shimmer.dart';
 
 class HomeView extends GetView<NewsController> {
+  const HomeView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,7 +50,7 @@ class HomeView extends GetView<NewsController> {
           Expanded(
             child: Obx(() {
               if (controller.isLoading) {
-                return LoadingShimmer();
+                return const LoadingShimmer();
               }
 
               if (controller.error.isNotEmpty) {

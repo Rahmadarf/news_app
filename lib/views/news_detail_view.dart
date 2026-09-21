@@ -9,6 +9,10 @@ import 'package:news_app/models/news_article.dart';
 import 'package:news_app/utils/app_colors.dart';
 
 class NewsDetailView extends StatelessWidget {
+  NewsDetailView({super.key});
+
+  // Unchecked route argument. Replaced by typed routing in Part 3;
+  // see docs/AUDIT.md H-10.
   final NewsArticle article = Get.arguments as NewsArticle;
 
   @override
@@ -103,7 +107,7 @@ class NewsDetailView extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
+                            color: AppColors.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
@@ -211,9 +215,11 @@ class NewsDetailView extends StatelessWidget {
 
   void _shareArticle() {
     if (article.url != null) {
-      Share.share(
-        '${article.title ?? 'Check out this news'}\n\n${article.url!}',
-        subject: article.title,
+      SharePlus.instance.share(
+        ShareParams(
+          text: '${article.title ?? 'Check out this news'}\n\n${article.url!}',
+          subject: article.title,
+        ),
       );
     }
   }
