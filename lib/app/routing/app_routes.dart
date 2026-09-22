@@ -18,6 +18,9 @@ abstract final class AppRoutes {
   static const String settingsName = 'settings';
   static const String settingsPath = '/settings';
 
+  static const String historyName = 'history';
+  static const String historyPath = '/history';
+
   /// Carries the canonical article URL in `?url=`.
   static const String articleName = 'article';
   static const String articlePath = '/article';

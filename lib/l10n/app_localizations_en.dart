@@ -294,4 +294,135 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get articleUnavailableNoLink =>
       'This link does not point at an article.';
+
+  @override
+  String get cancelAction => 'Cancel';
+
+  @override
+  String get createAction => 'Create';
+
+  @override
+  String get deleteAction => 'Delete';
+
+  @override
+  String get newCollection => 'New collection';
+
+  @override
+  String get collectionNameHint => 'Collection name';
+
+  @override
+  String get collectionExists => 'A collection with that name already exists';
+
+  @override
+  String get deleteCollectionTitle => 'Delete collection?';
+
+  @override
+  String deleteCollectionBody(String name) {
+    return '\"$name\" will be removed. The articles in it stay saved.';
+  }
+
+  @override
+  String get showAllSaved => 'Show all saved';
+
+  @override
+  String get bookmarksEmptyTitle => 'Save what matters';
+
+  @override
+  String get bookmarksEmptyBody =>
+      'Tap the bookmark icon on a story. Your picks collect here.';
+
+  @override
+  String get collectionEmptyTitle => 'Nothing filed here yet';
+
+  @override
+  String get collectionEmptyBody =>
+      'Open a saved story and file it into this collection.';
+
+  @override
+  String get saveToCollection => 'Save to collection';
+
+  @override
+  String get noCollection => 'No collection';
+
+  @override
+  String get readingHistoryTitle => 'Reading history';
+
+  @override
+  String get historyEmptyTitle => 'Start a story';
+
+  @override
+  String get historyEmptyBody => 'The articles you open will appear here.';
+
+  @override
+  String get clearHistoryTitle => 'Clear reading history?';
+
+  @override
+  String get clearHistoryBody =>
+      'The list of opened articles will be removed. Your saved articles are not affected.';
+
+  @override
+  String get settingsAppearance => 'Appearance';
+
+  @override
+  String get settingsContent => 'Content';
+
+  @override
+  String get settingsLibrary => 'Library';
+
+  @override
+  String get settingsStorage => 'Storage';
+
+  @override
+  String get settingsAbout => 'About';
+
+  @override
+  String get themeTitle => 'Theme';
+
+  @override
+  String get themeSystem => 'Follow the system';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
+
+  @override
+  String get editionTitle => 'Edition';
+
+  @override
+  String get languageTitle => 'Language';
+
+  @override
+  String get languageSystem => 'Follow the system';
+
+  @override
+  String get readingTextSizeTitle => 'Reading text size';
+
+  @override
+  String get readingTextSizeSubtitle =>
+      'Applied on top of your system text size.';
+
+  @override
+  String get savedArticles => 'Saved articles';
+
+  @override
+  String get clearCacheTitle => 'Clear cached stories';
+
+  @override
+  String get clearCacheSubtitle => 'Frees space used by downloaded feeds.';
+
+  @override
+  String get clearCacheConfirmBody =>
+      'Cached feeds will be removed. Saved articles and reading history are kept.';
+
+  @override
+  String get clearCacheDone => 'Cached stories cleared';
+
+  @override
+  String get openSourceLicenses => 'Open source licenses';
+
+  @override
+  String get aboutNewsline =>
+      'Newsline is a design reference build. Editorial content in mock mode is sample data and makes no claim about current events.';
 }

@@ -1,6 +1,6 @@
 # ARCHITECTURE — news_app
 
-Status: berlaku sejak Part 4 (fondasi data & domain).
+Status: berlaku sejak implementasi desain Newsline tahap 1–4.
 Pendamping: [`AUDIT.md`](AUDIT.md) memuat temuan yang memotivasi setiap keputusan
 di sini.
 
@@ -18,6 +18,9 @@ di sini.
 | Settings skalar | **`shared_preferences`** | Toggle tidak perlu migrasi skema |
 | Waktu | **`clock`** | `Clock` yang diinjeksi membuat TTL dapat diuji tanpa delay nyata |
 | Codegen | `build_runner` + `drift_dev` | Satu-satunya konsumen codegen adalah Drift |
+| Tipografi | Playfair Display + DM Sans, dibundel | Nol ketergantungan jaringan; OFL 1.1 di-commit bersamanya |
+| Lokalisasi | `flutter_localizations` + gen-l10n | Indonesia default, Inggris tersedia |
+| Token desain | `ThemeExtension` (`NewslineTokens`) | Peran yang tidak dimodelkan `ColorScheme` |
 
 Dependensi yang dihapus: `get` (GetX), `flutter_dotenv`.
 Dependensi yang ditambah: `flutter_riverpod`, `go_router`, `drift`, `sqlite3`,
@@ -38,46 +41,30 @@ lib/
   app/
     app.dart                    # NewsApp + ConfigurationErrorApp
     bootstrap.dart              # satu-satunya tempat inisialisasi
-    di/
-      providers.dart            # graf dependensi aplikasi
-    routing/
-      app_router.dart           # GoRouter + pembacaan argumen defensif
-      app_routes.dart           # path, nama, builder URL
+    di/providers.dart           # graf dependensi + preferensi
+    routing/                    # GoRouter, StatefulShellRoute, path
+    widgets/home_shell.dart     # bottom navigation
   core/
-    config/app_config.dart      # String.fromEnvironment + validasi
+    config/                     # String.fromEnvironment + validasi
     errors/failure.dart         # hierarki Failure bertipe
     persistence/                # AppDatabase (Drift), koneksi, SettingsStore
-    theme/                      # AppColors, AppTheme
-    widgets/status_views.dart   # FailureView, EmptyView, describeFailure
+    theme/                      # AppPalette, NewslineTokens, tipografi, tema
+    utils/                      # waktu relatif dan absolut
+    widgets/                    # StatusView, OfflineBanner, dialog konfirmasi
+  l10n/                         # app_en.arb, app_id.arb + hasil gen-l10n
   features/
-    news/
-      data/
-        datasources/            # NewsRemoteDataSource + Api + Mock + Local
-        dto/                    # ArticleDto, NewsResponseDto
-        mappers/                # ArticleMapper
-        repositories/           # NewsRepositoryImpl
-      domain/
-        entities/               # Article, ArticleSource, ArticleFeed, NewsCategory
-        repositories/           # NewsRepository (kontrak)
-      presentation/
-        controllers/            # NewsFeedController
-        state/                  # NewsFeedState
-        pages/                  # NewsFeedPage
-        widgets/                # ArticleCard, ArticleListView, CategorySelector, ArticleListShimmer
-    search/
-      presentation/             # SearchResultsController, SearchState, SearchResultsPage, SearchDialog
-    article_detail/
-      presentation/
-        controllers/            # cachedArticleProvider
-        pages/                  # ArticleDetailPage
+    news/                       # data + domain + presentation (Home)
+    search/                     # Discover: debounce, recent, sort
+    article_detail/             # layar baca, ukuran teks, aksi artikel
+    bookmarks/                  # simpanan + koleksi
+    history/                    # riwayat baca
+    settings/                   # preferensi
 assets/
+  fonts/                        # Playfair Display, DM Sans + OFL
   fixtures/                     # top_headlines.json, search.json (mode mock)
 test/
-  app_smoke_test.dart
-  core/config/
-  features/news/data/{datasources,mappers,repositories}/
-  features/news/presentation/
-  support/                      # fake tulis tangan
+  support/                      # fake, database in-memory, harness pumpApp
+  core/, features/              # mengikuti struktur lib/
 ```
 
 `search` belum memiliki `data/` atau `domain/` sendiri karena ia memakai
@@ -264,22 +251,28 @@ Record dibuang bila: tombstone `"[Removed]"` NewsAPI (judul/konten, atau host
 
 ## 8. Yang belum ada
 
-Struktur berikut **belum dibuat**, didokumentasikan agar nol direktori kosong
-di-scaffold lebih awal:
-
-```text
-lib/features/
-  bookmarks/     # domain + data + presentation  → prompt desain
-  history/                                        → prompt desain
-  settings/                                       → prompt desain
-```
-
 Perilaku yang sengaja belum ada:
 
-- Pembatalan request saat kategori berganti cepat. Generasi request atau
-  `CancelToken` adalah jalur yang direncanakan.
-- Penghapusan cache berbasis usia atau ukuran. Hanya `clearCache()` manual.
-- Persistensi settings selain kategori terpilih.
+- Pembatalan request saat kategori berganti cepat. Discover sudah memakai
+  penolakan hasil basi berbasis generasi; feed kategori belum.
+- Penghapusan cache berbasis usia atau ukuran. Hanya `clearCache()` manual dari
+  Settings.
+- Notifikasi. Desain referensi menampilkan tombol bel dan preferensi
+  notifikasi; nol layanan notifikasi dipasang, jadi bel hanya menyatakan bahwa
+  fiturnya belum ada dan toggle-nya tidak dibuat.
+- Akun, login, OTP, komentar, dan penerbitan oleh penulis. Ada di contact
+  sheet, tetapi di luar cakupan yang disepakati.
+- Nomor versi di layar About. Menduplikasi `pubspec.yaml` secara manual akan
+  menjadi basi; `package_info_plus` belum sepadan untuk satu baris teks.
+
+Verifikasi yang belum dilakukan:
+
+- **Screenshot perangkat light dan dark belum pernah diambil.** Nol klaim atas
+  kesetiaan piksel hasil render. Verifikasi visual yang ada baru widget test
+  dan pembacaan prototipe.
+- Peluncuran Android nyata masih terblokir lisensi NDK pada mesin lokal.
+- iOS, web, Windows, Linux: nol build dijalankan.
+- Mode `live` terhadap NewsAPI: nol request nyata dilakukan.
 
 ---
 
@@ -329,4 +322,39 @@ varian `Ready`).
 `AppRoutes.article(url)` membangun lokasi yang benar.
 
 **Inisialisasi** — `bootstrap()` adalah titik masuk tunggal. Dependensi baru
-didaftarkan di `lib/app/di/providers.dart`, bukan di dalam widget atau controller.
+didaftarkan di `lib/app/di/providers.dart`, bukan di dalam widget atau
+controller.
+
+**Repository lain**
+
+```dart
+// BookmarkRepository
+Stream<Set<String>> watchSavedUrls();
+Stream<List<SavedArticle>> watchSaved({String? collectionName});
+Stream<List<String>> watchCollections();
+Future<void> save(Article article, {String? collectionName});
+Future<void> remove(String url);
+Future<void> assignToCollection(String url, String? collectionName);
+Future<bool> createCollection(String name);   // false bila kosong atau duplikat
+Future<void> deleteCollection(String name);   // artikelnya tetap tersimpan
+
+// ReadingHistoryRepository
+Stream<List<Article>> watchRecent();
+Future<void> record(Article article);
+Future<void> clear();                          // bookmark tidak terpengaruh
+
+// RecentSearchRepository
+Stream<List<String>> watchRecent();            // maksimal 6
+Future<void> record(String query);
+Future<void> remove(String query);
+Future<void> clear();
+```
+
+**Preferensi** — `themeModeProvider`, `appLocaleProvider`,
+`selectedCountryProvider`, `selectedCategoryProvider`, dan
+`readingTextScaleProvider`. Semuanya dipersist lewat `SettingsStore`, dan
+semuanya jatuh ke default bila nilai tersimpan tidak dikenal.
+
+**Token desain** — `NewslineTokens.of(context)` untuk warna di luar
+`ColorScheme`; `Spacing`, `Radii`, dan `Dimens` untuk jarak, radius, dan ukuran
+komponen. Nol widget boleh menuliskan nilai hex atau angka jarak sendiri.

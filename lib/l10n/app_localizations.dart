@@ -619,6 +619,252 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This link does not point at an article.'**
   String get articleUnavailableNoLink;
+
+  /// No description provided for @cancelAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancelAction;
+
+  /// No description provided for @createAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get createAction;
+
+  /// No description provided for @deleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get deleteAction;
+
+  /// No description provided for @newCollection.
+  ///
+  /// In en, this message translates to:
+  /// **'New collection'**
+  String get newCollection;
+
+  /// No description provided for @collectionNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Collection name'**
+  String get collectionNameHint;
+
+  /// No description provided for @collectionExists.
+  ///
+  /// In en, this message translates to:
+  /// **'A collection with that name already exists'**
+  String get collectionExists;
+
+  /// No description provided for @deleteCollectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete collection?'**
+  String get deleteCollectionTitle;
+
+  /// No description provided for @deleteCollectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'\"{name}\" will be removed. The articles in it stay saved.'**
+  String deleteCollectionBody(String name);
+
+  /// No description provided for @showAllSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Show all saved'**
+  String get showAllSaved;
+
+  /// No description provided for @bookmarksEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save what matters'**
+  String get bookmarksEmptyTitle;
+
+  /// No description provided for @bookmarksEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the bookmark icon on a story. Your picks collect here.'**
+  String get bookmarksEmptyBody;
+
+  /// No description provided for @collectionEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing filed here yet'**
+  String get collectionEmptyTitle;
+
+  /// No description provided for @collectionEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Open a saved story and file it into this collection.'**
+  String get collectionEmptyBody;
+
+  /// No description provided for @saveToCollection.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to collection'**
+  String get saveToCollection;
+
+  /// No description provided for @noCollection.
+  ///
+  /// In en, this message translates to:
+  /// **'No collection'**
+  String get noCollection;
+
+  /// No description provided for @readingHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading history'**
+  String get readingHistoryTitle;
+
+  /// No description provided for @historyEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a story'**
+  String get historyEmptyTitle;
+
+  /// No description provided for @historyEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The articles you open will appear here.'**
+  String get historyEmptyBody;
+
+  /// No description provided for @clearHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear reading history?'**
+  String get clearHistoryTitle;
+
+  /// No description provided for @clearHistoryBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The list of opened articles will be removed. Your saved articles are not affected.'**
+  String get clearHistoryBody;
+
+  /// No description provided for @settingsAppearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get settingsAppearance;
+
+  /// No description provided for @settingsContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Content'**
+  String get settingsContent;
+
+  /// No description provided for @settingsLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Library'**
+  String get settingsLibrary;
+
+  /// No description provided for @settingsStorage.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage'**
+  String get settingsStorage;
+
+  /// No description provided for @settingsAbout.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get settingsAbout;
+
+  /// No description provided for @themeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get themeTitle;
+
+  /// No description provided for @themeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow the system'**
+  String get themeSystem;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeLight;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
+
+  /// No description provided for @editionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edition'**
+  String get editionTitle;
+
+  /// No description provided for @languageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get languageTitle;
+
+  /// No description provided for @languageSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow the system'**
+  String get languageSystem;
+
+  /// No description provided for @readingTextSizeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading text size'**
+  String get readingTextSizeTitle;
+
+  /// No description provided for @readingTextSizeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Applied on top of your system text size.'**
+  String get readingTextSizeSubtitle;
+
+  /// No description provided for @savedArticles.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved articles'**
+  String get savedArticles;
+
+  /// No description provided for @clearCacheTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear cached stories'**
+  String get clearCacheTitle;
+
+  /// No description provided for @clearCacheSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Frees space used by downloaded feeds.'**
+  String get clearCacheSubtitle;
+
+  /// No description provided for @clearCacheConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Cached feeds will be removed. Saved articles and reading history are kept.'**
+  String get clearCacheConfirmBody;
+
+  /// No description provided for @clearCacheDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Cached stories cleared'**
+  String get clearCacheDone;
+
+  /// No description provided for @openSourceLicenses.
+  ///
+  /// In en, this message translates to:
+  /// **'Open source licenses'**
+  String get openSourceLicenses;
+
+  /// No description provided for @aboutNewsline.
+  ///
+  /// In en, this message translates to:
+  /// **'Newsline is a design reference build. Editorial content in mock mode is sample data and makes no claim about current events.'**
+  String get aboutNewsline;
 }
 
 class _AppLocalizationsDelegate

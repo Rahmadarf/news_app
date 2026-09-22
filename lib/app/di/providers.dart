@@ -28,6 +28,7 @@ import 'package:news_app/features/news/data/datasources/news_local_data_source.d
 import 'package:news_app/features/news/data/datasources/news_remote_data_source.dart';
 import 'package:news_app/features/news/data/repositories/news_repository_impl.dart';
 import 'package:news_app/features/news/domain/entities/news_category.dart';
+import 'package:news_app/features/news/domain/entities/news_country.dart';
 import 'package:news_app/features/news/domain/repositories/news_repository.dart';
 import 'package:news_app/features/history/data/repositories/reading_history_repository_impl.dart';
 import 'package:news_app/features/history/domain/repositories/reading_history_repository.dart';
@@ -103,6 +104,9 @@ final newsRepositoryProvider = Provider<NewsRepository>((Ref ref) {
   return NewsRepositoryImpl(
     remote: ref.watch(newsRemoteDataSourceProvider),
     local: ref.watch(newsLocalDataSourceProvider),
+    // Watched, not read: changing the edition rebuilds the repository, and the
+    // country is part of the cache key, so each edition keeps its own pages.
+    country: ref.watch(selectedCountryProvider).apiValue,
   );
 });
 
@@ -207,5 +211,55 @@ class ReadingTextScaleController extends Notifier<double> {
       if ((step - value).abs() < (best - value).abs()) best = step;
     }
     return best;
+  }
+}
+
+/// Headline edition. Part of the feed cache key, so each edition caches
+/// separately.
+final selectedCountryProvider =
+    NotifierProvider<SelectedCountryController, NewsCountry>(
+      SelectedCountryController.new,
+    );
+
+class SelectedCountryController extends Notifier<NewsCountry> {
+  @override
+  NewsCountry build() {
+    return NewsCountry.fromApiValue(
+      ref.read(settingsStoreProvider).readCountry(),
+    );
+  }
+
+  void select(NewsCountry country) {
+    if (state == country) return;
+    state = country;
+    // Best effort: failing to persist a preference must not break the feed.
+    ref.read(settingsStoreProvider).writeCountry(country.apiValue);
+  }
+}
+
+/// Language override, or `null` to follow the device.
+final appLocaleProvider = NotifierProvider<AppLocaleController, Locale?>(
+  AppLocaleController.new,
+);
+
+class AppLocaleController extends Notifier<Locale?> {
+  /// Languages the app ships translations for.
+  static const List<Locale> supported = <Locale>[Locale('id'), Locale('en')];
+
+  @override
+  Locale? build() {
+    final String? stored = ref.read(settingsStoreProvider).readLocale();
+    if (stored == null) return null;
+    // An unknown stored tag falls back to following the device rather than
+    // leaving the app in a language it cannot render.
+    return supported.any((Locale l) => l.languageCode == stored)
+        ? Locale(stored)
+        : null;
+  }
+
+  void select(Locale? locale) {
+    if (state?.languageCode == locale?.languageCode) return;
+    state = locale;
+    ref.read(settingsStoreProvider).writeLocale(locale?.languageCode);
   }
 }

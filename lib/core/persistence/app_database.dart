@@ -54,17 +54,38 @@ class FeedPageMetadata extends Table {
   Set<Column<Object>> get primaryKey => <Column<Object>>{feedKey, page};
 }
 
-/// Groundwork for the bookmarks feature. No UI reads this yet.
+/// Reader-named bookmark collections.
+///
+/// The name is the identity, matching how the reader thinks about them, which
+/// also means two collections cannot share a name.
+@DataClassName('Collection')
+class Collections extends Table {
+  TextColumn get name => text()();
+  DateTimeColumn get createdAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => <Column<Object>>{name};
+}
+
+/// Saved articles, optionally filed into a collection.
 class Bookmarks extends Table {
   TextColumn get articleUrl =>
       text().references(CachedArticles, #url, onDelete: KeyAction.cascade)();
   DateTimeColumn get createdAt => dateTime()();
 
+  /// `null` means saved but not filed. Deleting a collection sets this back to
+  /// null rather than removing the bookmark.
+  TextColumn get collectionName => text().nullable().references(
+    Collections,
+    #name,
+    onDelete: KeyAction.setNull,
+  )();
+
   @override
   Set<Column<Object>> get primaryKey => <Column<Object>>{articleUrl};
 }
 
-/// Groundwork for reading history. No UI reads this yet.
+/// Articles the reader has opened.
 class ReadingHistoryEntries extends Table {
   TextColumn get articleUrl =>
       text().references(CachedArticles, #url, onDelete: KeyAction.cascade)();
@@ -89,10 +110,6 @@ class RecentSearches extends Table {
 
 /// Local database.
 ///
-/// Feed caching is the only part exercised today. The bookmark, history, and
-/// recent-search tables exist so those features can be added without a schema
-/// migration; nothing writes to them yet.
-///
 /// Search results are deliberately **not** cached. A search cache grows without
 /// bound across distinct queries, and stale search results are more misleading
 /// than stale headlines because the user just expressed a fresh intent.
@@ -101,6 +118,7 @@ class RecentSearches extends Table {
     CachedArticles,
     FeedEntries,
     FeedPageMetadata,
+    Collections,
     Bookmarks,
     ReadingHistoryEntries,
     RecentSearches,
@@ -110,13 +128,22 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (Migrator m) => m.createAll(),
+    onUpgrade: (Migrator m, int from, int to) async {
+      // v2 introduced named bookmark collections.
+      if (from < 2) {
+        await m.createTable(collections);
+        await m.addColumn(bookmarks, bookmarks.collectionName);
+      }
+    },
     beforeOpen: (OpeningDetails details) async {
-      // Required for the ON DELETE CASCADE relationships above.
+      // Required for the ON DELETE relationships above. Enabled after any
+      // migration has run, since SQLite cannot alter tables while foreign
+      // keys are enforced.
       await customStatement('PRAGMA foreign_keys = ON');
     },
   );

@@ -293,4 +293,136 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get articleUnavailableNoLink =>
       'Tautan ini tidak menunjuk ke sebuah artikel.';
+
+  @override
+  String get cancelAction => 'Batal';
+
+  @override
+  String get createAction => 'Buat';
+
+  @override
+  String get deleteAction => 'Hapus';
+
+  @override
+  String get newCollection => 'Koleksi baru';
+
+  @override
+  String get collectionNameHint => 'Nama koleksi';
+
+  @override
+  String get collectionExists => 'Koleksi dengan nama itu sudah ada';
+
+  @override
+  String get deleteCollectionTitle => 'Hapus koleksi?';
+
+  @override
+  String deleteCollectionBody(String name) {
+    return '\"$name\" akan dihapus. Artikel di dalamnya tetap tersimpan.';
+  }
+
+  @override
+  String get showAllSaved => 'Tampilkan semua simpanan';
+
+  @override
+  String get bookmarksEmptyTitle => 'Simpan yang berarti';
+
+  @override
+  String get bookmarksEmptyBody =>
+      'Ketuk ikon bookmark pada artikel. Cerita pilihan Anda terkumpul di sini.';
+
+  @override
+  String get collectionEmptyTitle => 'Belum ada yang masuk koleksi ini';
+
+  @override
+  String get collectionEmptyBody =>
+      'Buka cerita tersimpan lalu masukkan ke koleksi ini.';
+
+  @override
+  String get saveToCollection => 'Simpan ke koleksi';
+
+  @override
+  String get noCollection => 'Tanpa koleksi';
+
+  @override
+  String get readingHistoryTitle => 'Reading history';
+
+  @override
+  String get historyEmptyTitle => 'Mulai sebuah cerita';
+
+  @override
+  String get historyEmptyBody => 'Artikel yang Anda buka akan muncul di sini.';
+
+  @override
+  String get clearHistoryTitle => 'Hapus riwayat baca?';
+
+  @override
+  String get clearHistoryBody =>
+      'Daftar artikel yang pernah dibuka akan dihapus. Artikel tersimpan Anda tidak terpengaruh.';
+
+  @override
+  String get settingsAppearance => 'Tampilan';
+
+  @override
+  String get settingsContent => 'Konten';
+
+  @override
+  String get settingsLibrary => 'Koleksi';
+
+  @override
+  String get settingsStorage => 'Penyimpanan';
+
+  @override
+  String get settingsAbout => 'Tentang';
+
+  @override
+  String get themeTitle => 'Tema';
+
+  @override
+  String get themeSystem => 'Ikuti sistem';
+
+  @override
+  String get themeLight => 'Terang';
+
+  @override
+  String get themeDark => 'Gelap';
+
+  @override
+  String get editionTitle => 'Edisi';
+
+  @override
+  String get languageTitle => 'Bahasa';
+
+  @override
+  String get languageSystem => 'Ikuti sistem';
+
+  @override
+  String get readingTextSizeTitle => 'Ukuran teks bacaan';
+
+  @override
+  String get readingTextSizeSubtitle =>
+      'Diterapkan di atas ukuran teks sistem Anda.';
+
+  @override
+  String get savedArticles => 'Artikel tersimpan';
+
+  @override
+  String get clearCacheTitle => 'Hapus berita tersimpan di cache';
+
+  @override
+  String get clearCacheSubtitle =>
+      'Membebaskan ruang yang dipakai feed terunduh.';
+
+  @override
+  String get clearCacheConfirmBody =>
+      'Cache feed akan dihapus. Artikel tersimpan dan riwayat baca tetap disimpan.';
+
+  @override
+  String get clearCacheDone => 'Cache berita dihapus';
+
+  @override
+  String get openSourceLicenses => 'Lisensi sumber terbuka';
+
+  @override
+  String get aboutNewsline =>
+      'Newsline adalah build referensi desain. Konten editorial pada mode mock adalah data contoh dan nol klaim atas peristiwa terkini.';
 }

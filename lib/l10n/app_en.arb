@@ -126,5 +126,53 @@
         "type": "int"
       }
     }
+  },
+  "cancelAction": "Cancel",
+  "createAction": "Create",
+  "deleteAction": "Delete",
+  "newCollection": "New collection",
+  "collectionNameHint": "Collection name",
+  "collectionExists": "A collection with that name already exists",
+  "deleteCollectionTitle": "Delete collection?",
+  "deleteCollectionBody": "\"{name}\" will be removed. The articles in it stay saved.",
+  "showAllSaved": "Show all saved",
+  "bookmarksEmptyTitle": "Save what matters",
+  "bookmarksEmptyBody": "Tap the bookmark icon on a story. Your picks collect here.",
+  "collectionEmptyTitle": "Nothing filed here yet",
+  "collectionEmptyBody": "Open a saved story and file it into this collection.",
+  "saveToCollection": "Save to collection",
+  "noCollection": "No collection",
+  "readingHistoryTitle": "Reading history",
+  "historyEmptyTitle": "Start a story",
+  "historyEmptyBody": "The articles you open will appear here.",
+  "clearHistoryTitle": "Clear reading history?",
+  "clearHistoryBody": "The list of opened articles will be removed. Your saved articles are not affected.",
+  "settingsAppearance": "Appearance",
+  "settingsContent": "Content",
+  "settingsLibrary": "Library",
+  "settingsStorage": "Storage",
+  "settingsAbout": "About",
+  "themeTitle": "Theme",
+  "themeSystem": "Follow the system",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "editionTitle": "Edition",
+  "languageTitle": "Language",
+  "languageSystem": "Follow the system",
+  "readingTextSizeTitle": "Reading text size",
+  "readingTextSizeSubtitle": "Applied on top of your system text size.",
+  "savedArticles": "Saved articles",
+  "clearCacheTitle": "Clear cached stories",
+  "clearCacheSubtitle": "Frees space used by downloaded feeds.",
+  "clearCacheConfirmBody": "Cached feeds will be removed. Saved articles and reading history are kept.",
+  "clearCacheDone": "Cached stories cleared",
+  "openSourceLicenses": "Open source licenses",
+  "aboutNewsline": "Newsline is a design reference build. Editorial content in mock mode is sample data and makes no claim about current events.",
+  "@deleteCollectionBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

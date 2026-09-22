@@ -12,6 +12,9 @@ import 'package:news_app/features/article_detail/presentation/controllers/cached
 import 'package:news_app/features/article_detail/presentation/read_time.dart';
 import 'package:news_app/features/article_detail/presentation/widgets/article_body.dart';
 import 'package:news_app/features/article_detail/presentation/widgets/reading_controls.dart';
+import 'package:news_app/core/widgets/confirm_dialog.dart';
+import 'package:news_app/features/bookmarks/domain/repositories/bookmark_repository.dart';
+import 'package:news_app/features/bookmarks/presentation/controllers/bookmark_providers.dart';
 import 'package:news_app/features/bookmarks/presentation/widgets/bookmark_button.dart';
 import 'package:news_app/features/news/domain/entities/article.dart';
 import 'package:news_app/features/news/domain/entities/news_category.dart';
@@ -261,7 +264,7 @@ class _SourceLine extends StatelessWidget {
   }
 }
 
-class _DetailAppBar extends StatelessWidget {
+class _DetailAppBar extends ConsumerWidget {
   const _DetailAppBar({required this.article});
 
   final Article article;
@@ -271,7 +274,7 @@ class _DetailAppBar extends StatelessWidget {
   static const double narrowHeroHeight = 260;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final double width = MediaQuery.sizeOf(context).width;
     final double height = width < 420 ? narrowHeroHeight : heroHeight;
@@ -295,7 +298,7 @@ class _DetailAppBar extends StatelessWidget {
           icon: const Icon(Icons.share_outlined),
         ),
         IconButton(
-          onPressed: () => _showOptions(context, article),
+          onPressed: () => _showOptions(context, ref, article),
           tooltip: l10n.articleOptions,
           icon: const Icon(Icons.more_horiz),
         ),
@@ -315,9 +318,13 @@ class _DetailAppBar extends StatelessWidget {
 
   static Future<void> _showOptions(
     BuildContext context,
+    WidgetRef ref,
     Article article,
   ) async {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final bool isSaved =
+        ref.read(savedArticleUrlsProvider).value?.contains(article.url) ??
+        false;
 
     await showModalBottomSheet<void>(
       context: context,
@@ -326,6 +333,16 @@ class _DetailAppBar extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
+            // Filing only makes sense for an article that is already saved.
+            if (isSaved)
+              ListTile(
+                leading: const Icon(Icons.folder_outlined),
+                title: Text(l10n.saveToCollection),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _chooseCollection(context, ref, article);
+                },
+              ),
             ListTile(
               leading: const Icon(Icons.link),
               title: Text(l10n.copyLink),
@@ -350,6 +367,75 @@ class _DetailAppBar extends StatelessWidget {
                 ArticleActions.share(article);
               },
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Files a saved article into one of the reader's collections.
+  ///
+  /// Offers an escape hatch when there are no collections yet, rather than an
+  /// empty sheet.
+  static Future<void> _chooseCollection(
+    BuildContext context,
+    WidgetRef ref,
+    Article article,
+  ) async {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    final BookmarkRepository repository = ref.read(bookmarkRepositoryProvider);
+    final List<String> collections =
+        ref.read(collectionsProvider).value ?? const <String>[];
+
+    if (collections.isEmpty) {
+      final String? name = await promptForName(
+        context,
+        title: l10n.newCollection,
+        hint: l10n.collectionNameHint,
+        confirmLabel: l10n.createAction,
+      );
+      if (name == null) return;
+      await repository.createCollection(name);
+      await repository.assignToCollection(article.url, name.trim());
+      return;
+    }
+
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (BuildContext sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: Spacing.gutter,
+                vertical: Spacing.sm,
+              ),
+              child: Semantics(
+                header: true,
+                child: Text(
+                  l10n.saveToCollection,
+                  style: Theme.of(sheetContext).textTheme.headlineMedium,
+                ),
+              ),
+            ),
+            ListTile(
+              title: Text(l10n.noCollection),
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                repository.assignToCollection(article.url, null);
+              },
+            ),
+            for (final String name in collections)
+              ListTile(
+                title: Text(name),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  repository.assignToCollection(article.url, name);
+                },
+              ),
           ],
         ),
       ),

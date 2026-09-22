@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:news_app/app/routing/app_routes.dart';
 import 'package:news_app/app/widgets/home_shell.dart';
+import 'package:news_app/features/bookmarks/presentation/pages/bookmarks_page.dart';
+import 'package:news_app/features/history/presentation/pages/reading_history_page.dart';
+import 'package:news_app/features/settings/presentation/pages/settings_page.dart';
 import 'package:news_app/features/article_detail/presentation/pages/article_detail_page.dart';
 import 'package:news_app/features/news/domain/entities/article.dart';
 import 'package:news_app/features/news/domain/entities/news_category.dart';
 import 'package:news_app/features/news/presentation/pages/news_feed_page.dart';
 import 'package:news_app/features/search/presentation/pages/discover_page.dart';
-import 'package:news_app/l10n/app_localizations.dart';
 
 /// Builds the application router.
 ///
@@ -61,9 +63,7 @@ GoRouter createRouter({String? initialLocation}) {
                 name: AppRoutes.bookmarksName,
                 path: AppRoutes.bookmarksPath,
                 builder: (BuildContext context, GoRouterState state) =>
-                    ComingSoonPage(
-                      title: AppLocalizations.of(context).bookmarkTab,
-                    ),
+                    const BookmarksPage(),
               ),
             ],
           ),
@@ -73,13 +73,18 @@ GoRouter createRouter({String? initialLocation}) {
                 name: AppRoutes.settingsName,
                 path: AppRoutes.settingsPath,
                 builder: (BuildContext context, GoRouterState state) =>
-                    ComingSoonPage(
-                      title: AppLocalizations.of(context).settingsTab,
-                    ),
+                    const SettingsPage(),
               ),
             ],
           ),
         ],
+      ),
+      GoRoute(
+        name: AppRoutes.historyName,
+        path: AppRoutes.historyPath,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (BuildContext context, GoRouterState state) =>
+            const ReadingHistoryPage(),
       ),
       GoRoute(
         name: AppRoutes.articleName,
