@@ -529,6 +529,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =0{No stories} =1{1 story} other{{count} stories}}'**
   String searchResultCount(int count);
+
+  /// No description provided for @shareArticle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share article'**
+  String get shareArticle;
+
+  /// No description provided for @articleOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Article options'**
+  String get articleOptions;
+
+  /// No description provided for @copyLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy link'**
+  String get copyLink;
+
+  /// No description provided for @openInBrowser.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in browser'**
+  String get openInBrowser;
+
+  /// No description provided for @linkCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Link copied'**
+  String get linkCopied;
+
+  /// No description provided for @couldNotOpenLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open the link'**
+  String get couldNotOpenLink;
+
+  /// No description provided for @readFullArticle.
+  ///
+  /// In en, this message translates to:
+  /// **'Read the full article'**
+  String get readFullArticle;
+
+  /// No description provided for @relatedStoriesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Related stories'**
+  String get relatedStoriesTitle;
+
+  /// No description provided for @increaseTextSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Increase text size'**
+  String get increaseTextSize;
+
+  /// No description provided for @decreaseTextSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Decrease text size'**
+  String get decreaseTextSize;
+
+  /// No description provided for @readMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min read'**
+  String readMinutes(int minutes);
+
+  /// No description provided for @truncatedContentNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'The news service provides an excerpt only. Open the full article at its source.'**
+  String get truncatedContentNotice;
+
+  /// No description provided for @articleUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Article not loaded'**
+  String get articleUnavailableTitle;
+
+  /// No description provided for @articleUnavailableBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Open it from the feed, or read it on the web.'**
+  String get articleUnavailableBody;
+
+  /// No description provided for @articleUnavailableNoLink.
+  ///
+  /// In en, this message translates to:
+  /// **'This link does not point at an article.'**
+  String get articleUnavailableNoLink;
 }
 
 class _AppLocalizationsDelegate

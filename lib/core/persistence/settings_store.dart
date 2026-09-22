@@ -5,13 +5,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Deliberately separate from the Drift database: a toggle should not require
 /// a schema migration, and these values have no relational shape.
 ///
-/// Holds the selected category and the theme preference today. Locale and
-/// country join them when the settings screen lands.
+/// Holds the selected category, the theme preference, and the reading text
+/// size today. Locale and country join them when the settings screen lands.
 class SettingsStore {
   const SettingsStore(this._prefs);
 
   static const String selectedCategoryKey = 'settings.selected_category';
   static const String themeModeKey = 'settings.theme_mode';
+  static const String readingTextScaleKey = 'settings.reading_text_scale';
 
   final SharedPreferences _prefs;
 
@@ -32,4 +33,11 @@ class SettingsStore {
 
   Future<void> writeThemeMode(String value) =>
       _prefs.setString(themeModeKey, value);
+
+  /// Reader's own text-size multiplier for article body copy. `null` until
+  /// they change it.
+  double? readReadingTextScale() => _prefs.getDouble(readingTextScaleKey);
+
+  Future<void> writeReadingTextScale(double value) =>
+      _prefs.setDouble(readingTextScaleKey, value);
 }

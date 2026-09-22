@@ -120,6 +120,7 @@ abstract final class Spacing {
 
 /// Corner radii from the specification.
 abstract final class Radii {
+  static const double badge = 4;
   static const double thumbnail = 9;
   static const double hero = 13;
   static const double field = 12;

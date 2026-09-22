@@ -1,15 +1,26 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:news_app/app/di/providers.dart';
+import 'package:news_app/app/routing/app_routes.dart';
+import 'package:news_app/core/config/app_config.dart';
 import 'package:news_app/core/theme/newsline_tokens.dart';
 import 'package:news_app/core/utils/relative_time.dart';
-import 'package:news_app/l10n/app_localizations.dart';
 import 'package:news_app/core/widgets/status_views.dart';
+import 'package:news_app/features/article_detail/presentation/article_actions.dart';
 import 'package:news_app/features/article_detail/presentation/controllers/cached_article_provider.dart';
+import 'package:news_app/features/article_detail/presentation/read_time.dart';
+import 'package:news_app/features/article_detail/presentation/widgets/article_body.dart';
+import 'package:news_app/features/article_detail/presentation/widgets/reading_controls.dart';
+import 'package:news_app/features/bookmarks/presentation/widgets/bookmark_button.dart';
 import 'package:news_app/features/news/domain/entities/article.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:news_app/features/news/domain/entities/news_category.dart';
+import 'package:news_app/features/news/presentation/controllers/news_feed_controller.dart';
+import 'package:news_app/features/news/presentation/state/news_feed_state.dart';
+import 'package:news_app/features/news/presentation/widgets/article_photo.dart';
+import 'package:news_app/features/news/presentation/widgets/article_row.dart';
+import 'package:news_app/features/news/presentation/widgets/section_header.dart';
+import 'package:news_app/l10n/app_localizations.dart';
 
 /// Article reader.
 ///
@@ -20,21 +31,30 @@ import 'package:url_launcher/url_launcher.dart';
 /// falls back to an explanatory state rather than crashing. See
 /// docs/AUDIT.md H-10.
 class ArticleDetailPage extends ConsumerWidget {
-  const ArticleDetailPage({super.key, this.article, this.articleUrl});
+  const ArticleDetailPage({
+    super.key,
+    this.article,
+    this.articleUrl,
+    this.category,
+  });
 
   final Article? article;
   final String? articleUrl;
 
+  /// Category the reader opened the article from, when known. Absent on a deep
+  /// link, in which case the eyebrow simply omits it.
+  final NewsCategory? category;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final Article? handedOver = article;
-    if (handedOver != null) return _Reader(article: handedOver);
+    if (handedOver != null) {
+      return _Reader(article: handedOver, category: category);
+    }
 
     final String? url = articleUrl;
     if (url == null) {
-      return const _Unavailable(
-        message: 'This link does not point at an article.',
-      );
+      return const _Unavailable(canOpenInBrowser: false);
     }
 
     return ref
@@ -42,177 +62,153 @@ class ArticleDetailPage extends ConsumerWidget {
         .when(
           loading: () =>
               const Scaffold(body: Center(child: CircularProgressIndicator())),
-          error: (Object error, StackTrace stackTrace) => _Unavailable(
-            articleUrl: url,
-            message: 'This article could not be loaded from storage.',
-          ),
+          error: (Object error, StackTrace stackTrace) =>
+              _Unavailable(articleUrl: url),
           data: (Article? cached) => cached != null
-              ? _Reader(article: cached)
-              : _Unavailable(
-                  articleUrl: url,
-                  message: 'Open it from the feed, or read it on the web.',
-                ),
+              ? _Reader(article: cached, category: category)
+              : _Unavailable(articleUrl: url),
         );
   }
 }
 
-class _Unavailable extends StatelessWidget {
-  const _Unavailable({required this.message, this.articleUrl});
-
-  final String message;
-  final String? articleUrl;
-
-  @override
-  Widget build(BuildContext context) {
-    final String? url = articleUrl;
-
-    return Scaffold(
-      appBar: AppBar(title: const Text('Article')),
-      body: StatusView(
-        icon: Icons.article_outlined,
-        title: AppLocalizations.of(context).comingSoonTitle,
-        message: message,
-      ),
-      floatingActionButton: url == null
-          ? null
-          : FloatingActionButton.extended(
-              onPressed: () => _openInBrowser(context, url),
-              icon: const Icon(Icons.open_in_browser),
-              label: const Text('Open in browser'),
-            ),
-    );
-  }
-}
-
-class _Reader extends StatelessWidget {
-  const _Reader({required this.article});
+class _Reader extends ConsumerStatefulWidget {
+  const _Reader({required this.article, this.category});
 
   final Article article;
+  final NewsCategory? category;
+
+  @override
+  ConsumerState<_Reader> createState() => _ReaderState();
+}
+
+class _ReaderState extends ConsumerState<_Reader> {
+  @override
+  void initState() {
+    super.initState();
+    // Opening an article is what puts it at the top of reading history. Done
+    // once per screen, not on every rebuild, and best effort: a storage
+    // problem must not interrupt reading.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref
+          .read(readingHistoryRepositoryProvider)
+          .record(widget.article)
+          .catchError((Object _) {});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final Article article = widget.article;
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    final ThemeData theme = Theme.of(context);
+    final NewslineTokens tokens = NewslineTokens.of(context);
+    final double readerScale = ref.watch(readingTextScaleProvider);
+    final bool usingMockData =
+        ref.watch(appConfigProvider).dataSourceMode == NewsDataSourceMode.mock;
+    final List<String> paragraphs = _bodyParagraphs(article);
+
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
           _DetailAppBar(article: article),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  _SourceLine(article: article),
-                  const SizedBox(height: 16),
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(
+              Spacing.gutter,
+              Spacing.lg,
+              Spacing.gutter,
+              0,
+            ),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate(<Widget>[
+                _Eyebrow(
+                  category: widget.category,
+                  readMinutes: estimatedReadMinutes(article),
+                ),
+                const SizedBox(height: Spacing.md),
+                Text(article.title, style: theme.textTheme.displaySmall),
+                const SizedBox(height: Spacing.md),
+                _SourceLine(article: article),
+                ReadingControls(dateLabel: _absoluteDate(context, article)),
+                if (article.description != null)
+                  Text(article.description!, style: theme.textTheme.bodyMedium),
+                const SizedBox(height: Spacing.gutter),
+                if (paragraphs.isNotEmpty)
+                  ArticleBody(paragraphs: paragraphs, readerScale: readerScale),
+                if (usingMockData) ...<Widget>[
                   Text(
-                    article.title,
-                    style: Theme.of(context).textTheme.displaySmall,
-                  ),
-                  if (article.description != null) ...<Widget>[
-                    const SizedBox(height: 16),
-                    Text(
-                      article.description!,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ],
-                  if (article.content != null) ...<Widget>[
-                    const SizedBox(height: 20),
-                    Text(
-                      'Content',
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      article.content!,
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                  ],
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => _openInBrowser(context, article.url),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text(
-                        'Read Full Article',
-                        style: TextStyle(fontSize: 16),
-                      ),
+                    l10n.sampleDataNotice,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: tokens.textSecondary,
+                      fontStyle: FontStyle.italic,
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: Spacing.md),
                 ],
-              ),
+                Text(
+                  l10n.truncatedContentNotice,
+                  style: theme.textTheme.labelSmall,
+                ),
+                const SizedBox(height: Spacing.lg),
+                ElevatedButton(
+                  onPressed: () =>
+                      ArticleActions.openInBrowser(context, article.url),
+                  child: Text('${l10n.readFullArticle} ↗'),
+                ),
+              ]),
             ),
           ),
+          _RelatedStories(current: article, category: widget.category),
+          const SliverToBoxAdapter(child: SizedBox(height: Spacing.xxl)),
         ],
       ),
     );
   }
+
+  static List<String> _bodyParagraphs(Article article) {
+    final String? content = article.content;
+    if (content == null) return const <String>[];
+    return content
+        .split(RegExp(r'\n{2,}'))
+        .map((String p) => p.trim())
+        .where((String p) => p.isNotEmpty)
+        .toList(growable: false);
+  }
+
+  static String? _absoluteDate(BuildContext context, Article article) {
+    final DateTime? publishedAt = article.publishedAt;
+    if (publishedAt == null) return null;
+    return formatAbsoluteDate(
+      publishedAt,
+      Localizations.localeOf(context).toString(),
+    );
+  }
 }
 
-class _DetailAppBar extends StatelessWidget {
-  const _DetailAppBar({required this.article});
+class _Eyebrow extends StatelessWidget {
+  const _Eyebrow({required this.category, required this.readMinutes});
 
-  final Article article;
+  final NewsCategory? category;
+  final int? readMinutes;
 
   @override
   Widget build(BuildContext context) {
-    final String? imageUrl = article.imageUrl;
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    final NewslineTokens tokens = NewslineTokens.of(context);
 
-    return SliverAppBar(
-      expandedHeight: 300,
-      pinned: true,
-      flexibleSpace: FlexibleSpaceBar(
-        background: imageUrl == null
-            ? const _HeaderPlaceholder(icon: Icons.newspaper)
-            : CachedNetworkImage(
-                imageUrl: imageUrl,
-                fit: BoxFit.cover,
-                placeholder: (BuildContext context, String url) =>
-                    const _HeaderPlaceholder(),
-                errorWidget: (BuildContext context, String url, Object error) =>
-                    const _HeaderPlaceholder(icon: Icons.image_not_supported),
-              ),
+    final List<String> parts = <String>[
+      if (category != null) category!.label.toUpperCase(),
+      if (readMinutes != null) l10n.readMinutes(readMinutes!).toUpperCase(),
+    ];
+    if (parts.isEmpty) return const SizedBox.shrink();
+
+    return Text(
+      parts.join('  ·  '),
+      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+        color: tokens.accent,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 1.1,
       ),
-      actions: <Widget>[
-        IconButton(
-          icon: const Icon(Icons.share),
-          onPressed: () => _shareArticle(article),
-        ),
-        PopupMenuButton<String>(
-          onSelected: (String value) => switch (value) {
-            'copy_link' => _copyLink(context, article.url),
-            'open_browser' => _openInBrowser(context, article.url),
-            _ => null,
-          },
-          itemBuilder: (BuildContext context) => const <PopupMenuEntry<String>>[
-            PopupMenuItem<String>(
-              value: 'copy_link',
-              child: Row(
-                children: <Widget>[
-                  Icon(Icons.copy),
-                  SizedBox(width: 8),
-                  Text('Copy Link'),
-                ],
-              ),
-            ),
-            PopupMenuItem<String>(
-              value: 'open_browser',
-              child: Row(
-                children: <Widget>[
-                  Icon(Icons.open_in_browser),
-                  SizedBox(width: 8),
-                  Text('Open in Browser'),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ],
     );
   }
 }
@@ -224,32 +220,40 @@ class _SourceLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final NewslineTokens tokens = NewslineTokens.of(context);
     final DateTime? publishedAt = article.publishedAt;
 
     return Row(
       children: <Widget>[
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          padding: const EdgeInsets.symmetric(
+            horizontal: Spacing.sm,
+            vertical: Spacing.xs,
+          ),
           decoration: BoxDecoration(
-            color: NewslineTokens.of(context).tintedSurface,
-            borderRadius: BorderRadius.circular(4),
+            color: tokens.tintedSurface,
+            borderRadius: BorderRadius.circular(Radii.badge),
           ),
           child: Text(
             article.source.name,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: NewslineTokens.of(context).accent,
+              color: tokens.accent,
               fontWeight: FontWeight.w600,
             ),
           ),
         ),
         if (publishedAt != null) ...<Widget>[
-          const SizedBox(width: 12),
-          Text(
-            formatRelativeTime(
-              publishedAt,
-              Localizations.localeOf(context).languageCode,
+          const SizedBox(width: Spacing.md),
+          Flexible(
+            child: Text(
+              formatRelativeTime(
+                publishedAt,
+                Localizations.localeOf(context).languageCode,
+              ),
+              style: Theme.of(context).textTheme.labelSmall,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            style: Theme.of(context).textTheme.labelSmall,
           ),
         ],
       ],
@@ -257,52 +261,181 @@ class _SourceLine extends StatelessWidget {
   }
 }
 
-class _HeaderPlaceholder extends StatelessWidget {
-  const _HeaderPlaceholder({this.icon});
+class _DetailAppBar extends StatelessWidget {
+  const _DetailAppBar({required this.article});
 
-  final IconData? icon;
+  final Article article;
+
+  /// Hero height from the design: taller on a narrow phone layout.
+  static const double heroHeight = 237;
+  static const double narrowHeroHeight = 260;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: NewslineTokens.of(context).surfaceSecondary,
-      child: Center(
-        child: icon == null
-            ? const CircularProgressIndicator()
-            : Icon(
-                icon,
-                size: 50,
-                color: NewslineTokens.of(context).textSecondary,
-              ),
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    final double width = MediaQuery.sizeOf(context).width;
+    final double height = width < 420 ? narrowHeroHeight : heroHeight;
+
+    return SliverAppBar(
+      expandedHeight: height,
+      pinned: true,
+      leading: BackButton(onPressed: () => goBack(context)),
+      flexibleSpace: FlexibleSpaceBar(
+        background: ArticlePhoto(
+          url: article.imageUrl,
+          height: height,
+          radius: 0,
+        ),
+      ),
+      actions: <Widget>[
+        BookmarkButton(article: article),
+        IconButton(
+          onPressed: () => ArticleActions.share(article),
+          tooltip: l10n.shareArticle,
+          icon: const Icon(Icons.share_outlined),
+        ),
+        IconButton(
+          onPressed: () => _showOptions(context, article),
+          tooltip: l10n.articleOptions,
+          icon: const Icon(Icons.more_horiz),
+        ),
+      ],
+    );
+  }
+
+  /// Returns to wherever the reader came from, falling back to the feed so a
+  /// deep link never leaves them on a dead end.
+  static void goBack(BuildContext context) {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go(AppRoutes.feedPath);
+    }
+  }
+
+  static Future<void> _showOptions(
+    BuildContext context,
+    Article article,
+  ) async {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (BuildContext sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ListTile(
+              leading: const Icon(Icons.link),
+              title: Text(l10n.copyLink),
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                ArticleActions.copyLink(context, article.url);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.open_in_browser),
+              title: Text(l10n.openInBrowser),
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                ArticleActions.openInBrowser(context, article.url);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.share_outlined),
+              title: Text(l10n.shareArticle),
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                ArticleActions.share(article);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-void _shareArticle(Article article) {
-  SharePlus.instance.share(
-    ShareParams(
-      text: '${article.title}\n\n${article.url}',
-      subject: article.title,
-    ),
-  );
+/// Two more stories from the same feed, excluding the one being read.
+///
+/// Reads the already-loaded category feed rather than issuing another request.
+class _RelatedStories extends ConsumerWidget {
+  const _RelatedStories({required this.current, this.category});
+
+  final Article current;
+  final NewsCategory? category;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    final NewsCategory effective = category ?? NewsCategory.fallback;
+    final NewsFeedState state = ref.watch(
+      newsFeedControllerProvider(effective),
+    );
+
+    final List<Article> related = state is NewsFeedReady
+        ? state.articles
+              .where((Article a) => a.url != current.url)
+              .take(2)
+              .toList()
+        : const <Article>[];
+
+    if (related.isEmpty) {
+      return const SliverToBoxAdapter(child: SizedBox.shrink());
+    }
+
+    return SliverList(
+      delegate: SliverChildListDelegate(<Widget>[
+        SectionHeader(title: l10n.relatedStoriesTitle),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: Spacing.gutter),
+          child: Column(
+            children: <Widget>[
+              for (int i = 0; i < related.length; i++)
+                ArticleRow(
+                  article: related[i],
+                  showDivider: i != related.length - 1,
+                  onTap: () => context.push(
+                    AppRoutes.article(related[i].url, category: effective),
+                    extra: related[i],
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ]),
+    );
+  }
 }
 
-void _copyLink(BuildContext context, String url) {
-  Clipboard.setData(ClipboardData(text: url));
-  ScaffoldMessenger.of(
-    context,
-  ).showSnackBar(const SnackBar(content: Text('Link copied to clipboard')));
-}
+class _Unavailable extends StatelessWidget {
+  const _Unavailable({this.articleUrl, this.canOpenInBrowser = true});
 
-Future<void> _openInBrowser(BuildContext context, String rawUrl) async {
-  final Uri? uri = Uri.tryParse(rawUrl);
-  final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+  final String? articleUrl;
+  final bool canOpenInBrowser;
 
-  if (uri == null ||
-      !await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-    messenger.showSnackBar(
-      const SnackBar(content: Text('Could not open the link')),
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    final String? url = articleUrl;
+    final bool offerBrowser = url != null && canOpenInBrowser;
+
+    return Scaffold(
+      appBar: AppBar(),
+      body: SafeArea(
+        child: StatusView(
+          icon: Icons.article_outlined,
+          title: l10n.articleUnavailableTitle,
+          message: url == null
+              ? l10n.articleUnavailableNoLink
+              : l10n.articleUnavailableBody,
+          actionLabel: offerBrowser ? l10n.openInBrowser : null,
+          onAction: offerBrowser
+              ? () => ArticleActions.openInBrowser(context, url)
+              : null,
+        ),
+      ),
     );
   }
 }

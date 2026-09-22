@@ -71,5 +71,20 @@
   "sortRelevancy": "Paling relevan",
   "sortNewest": "Terbaru",
   "sortPopularity": "Populer",
-  "searchResultCount": "{count, plural, =0{Nol cerita} other{{count} cerita}}"
+  "searchResultCount": "{count, plural, =0{Nol cerita} other{{count} cerita}}",
+  "shareArticle": "Bagikan artikel",
+  "articleOptions": "Opsi artikel",
+  "copyLink": "Salin tautan",
+  "openInBrowser": "Buka di browser",
+  "linkCopied": "Tautan disalin",
+  "couldNotOpenLink": "Tautan tidak dapat dibuka",
+  "readFullArticle": "Baca artikel lengkap",
+  "relatedStoriesTitle": "Cerita terkait",
+  "increaseTextSize": "Perbesar ukuran teks",
+  "decreaseTextSize": "Perkecil ukuran teks",
+  "readMinutes": "{minutes} menit baca",
+  "truncatedContentNotice": "Layanan berita hanya menyediakan kutipan. Buka artikel lengkapnya di sumber aslinya.",
+  "articleUnavailableTitle": "Artikel belum dimuat",
+  "articleUnavailableBody": "Buka dari feed, atau baca di web.",
+  "articleUnavailableNoLink": "Tautan ini tidak menunjuk ke sebuah artikel."
 }

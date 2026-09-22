@@ -104,5 +104,27 @@
         "type": "int"
       }
     }
+  },
+  "shareArticle": "Share article",
+  "articleOptions": "Article options",
+  "copyLink": "Copy link",
+  "openInBrowser": "Open in browser",
+  "linkCopied": "Link copied",
+  "couldNotOpenLink": "Could not open the link",
+  "readFullArticle": "Read the full article",
+  "relatedStoriesTitle": "Related stories",
+  "increaseTextSize": "Increase text size",
+  "decreaseTextSize": "Decrease text size",
+  "readMinutes": "{minutes} min read",
+  "truncatedContentNotice": "The news service provides an excerpt only. Open the full article at its source.",
+  "articleUnavailableTitle": "Article not loaded",
+  "articleUnavailableBody": "Open it from the feed, or read it on the web.",
+  "articleUnavailableNoLink": "This link does not point at an article.",
+  "@readMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
   }
 }

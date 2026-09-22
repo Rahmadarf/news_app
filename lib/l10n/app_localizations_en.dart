@@ -244,4 +244,54 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get shareArticle => 'Share article';
+
+  @override
+  String get articleOptions => 'Article options';
+
+  @override
+  String get copyLink => 'Copy link';
+
+  @override
+  String get openInBrowser => 'Open in browser';
+
+  @override
+  String get linkCopied => 'Link copied';
+
+  @override
+  String get couldNotOpenLink => 'Could not open the link';
+
+  @override
+  String get readFullArticle => 'Read the full article';
+
+  @override
+  String get relatedStoriesTitle => 'Related stories';
+
+  @override
+  String get increaseTextSize => 'Increase text size';
+
+  @override
+  String get decreaseTextSize => 'Decrease text size';
+
+  @override
+  String readMinutes(int minutes) {
+    return '$minutes min read';
+  }
+
+  @override
+  String get truncatedContentNotice =>
+      'The news service provides an excerpt only. Open the full article at its source.';
+
+  @override
+  String get articleUnavailableTitle => 'Article not loaded';
+
+  @override
+  String get articleUnavailableBody =>
+      'Open it from the feed, or read it on the web.';
+
+  @override
+  String get articleUnavailableNoLink =>
+      'This link does not point at an article.';
 }

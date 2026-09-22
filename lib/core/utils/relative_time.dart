@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 /// Locales for which relative-time messages are registered at start-up.
@@ -12,4 +13,11 @@ String formatRelativeTime(DateTime moment, String languageCode) {
     moment,
     locale: kRelativeTimeLocales.contains(languageCode) ? languageCode : 'en',
   );
+}
+
+/// "22 September 2026" in the active locale.
+///
+/// Used where an exact publication date matters more than "2 hours ago".
+String formatAbsoluteDate(DateTime moment, String locale) {
+  return DateFormat.yMMMMd(locale).format(moment.toLocal());
 }

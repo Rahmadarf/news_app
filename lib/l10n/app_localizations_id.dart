@@ -244,4 +244,53 @@ class AppLocalizationsId extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get shareArticle => 'Bagikan artikel';
+
+  @override
+  String get articleOptions => 'Opsi artikel';
+
+  @override
+  String get copyLink => 'Salin tautan';
+
+  @override
+  String get openInBrowser => 'Buka di browser';
+
+  @override
+  String get linkCopied => 'Tautan disalin';
+
+  @override
+  String get couldNotOpenLink => 'Tautan tidak dapat dibuka';
+
+  @override
+  String get readFullArticle => 'Baca artikel lengkap';
+
+  @override
+  String get relatedStoriesTitle => 'Cerita terkait';
+
+  @override
+  String get increaseTextSize => 'Perbesar ukuran teks';
+
+  @override
+  String get decreaseTextSize => 'Perkecil ukuran teks';
+
+  @override
+  String readMinutes(int minutes) {
+    return '$minutes menit baca';
+  }
+
+  @override
+  String get truncatedContentNotice =>
+      'Layanan berita hanya menyediakan kutipan. Buka artikel lengkapnya di sumber aslinya.';
+
+  @override
+  String get articleUnavailableTitle => 'Artikel belum dimuat';
+
+  @override
+  String get articleUnavailableBody => 'Buka dari feed, atau baca di web.';
+
+  @override
+  String get articleUnavailableNoLink =>
+      'Tautan ini tidak menunjuk ke sebuah artikel.';
 }

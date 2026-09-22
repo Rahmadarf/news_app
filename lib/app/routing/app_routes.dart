@@ -1,3 +1,5 @@
+import 'package:news_app/features/news/domain/entities/news_category.dart';
+
 /// Route paths and names, in one place.
 ///
 /// Query parameters are part of the contract: they make every destination
@@ -23,14 +25,21 @@ abstract final class AppRoutes {
   static const String queryParam = 'q';
   static const String urlParam = 'url';
 
+  /// Category the article was opened from, so the eyebrow and related stories
+  /// survive a shared link.
+  static const String categoryParam = 'cat';
+
   /// Discover with a pre-filled term, for deep links.
   static String discoverWithQuery(String query) => Uri(
     path: discoverPath,
     queryParameters: <String, String>{queryParam: query},
   ).toString();
 
-  static String article(String articleUrl) => Uri(
+  static String article(String articleUrl, {NewsCategory? category}) => Uri(
     path: articlePath,
-    queryParameters: <String, String>{urlParam: articleUrl},
+    queryParameters: <String, String>{
+      urlParam: articleUrl,
+      categoryParam: ?category?.apiValue,
+    },
   ).toString();
 }

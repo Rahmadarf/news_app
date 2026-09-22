@@ -217,7 +217,10 @@ class _Feed extends ConsumerWidget {
   }
 
   void _openArticle(BuildContext context, Article article) {
-    context.push(AppRoutes.article(article.url), extra: article);
+    context.push(
+      AppRoutes.article(article.url, category: category),
+      extra: article,
+    );
   }
 
   static String? _updatedLabel(

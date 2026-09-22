@@ -4,6 +4,7 @@ import 'package:news_app/app/routing/app_routes.dart';
 import 'package:news_app/app/widgets/home_shell.dart';
 import 'package:news_app/features/article_detail/presentation/pages/article_detail_page.dart';
 import 'package:news_app/features/news/domain/entities/article.dart';
+import 'package:news_app/features/news/domain/entities/news_category.dart';
 import 'package:news_app/features/news/presentation/pages/news_feed_page.dart';
 import 'package:news_app/features/search/presentation/pages/discover_page.dart';
 import 'package:news_app/l10n/app_localizations.dart';
@@ -91,7 +92,17 @@ GoRouter createRouter({String? initialLocation}) {
           final String? articleUrl =
               article?.url ?? state.uri.queryParameters[AppRoutes.urlParam];
 
-          return ArticleDetailPage(article: article, articleUrl: articleUrl);
+          final String? rawCategory =
+              state.uri.queryParameters[AppRoutes.categoryParam];
+          final NewsCategory? category = rawCategory == null
+              ? null
+              : NewsCategory.fromApiValue(rawCategory);
+
+          return ArticleDetailPage(
+            article: article,
+            articleUrl: articleUrl,
+            category: category,
+          );
         },
       ),
     ],

@@ -29,6 +29,8 @@ import 'package:news_app/features/news/data/datasources/news_remote_data_source.
 import 'package:news_app/features/news/data/repositories/news_repository_impl.dart';
 import 'package:news_app/features/news/domain/entities/news_category.dart';
 import 'package:news_app/features/news/domain/repositories/news_repository.dart';
+import 'package:news_app/features/history/data/repositories/reading_history_repository_impl.dart';
+import 'package:news_app/features/history/domain/repositories/reading_history_repository.dart';
 import 'package:news_app/features/search/data/repositories/recent_search_repository_impl.dart';
 import 'package:news_app/features/search/domain/repositories/recent_search_repository.dart';
 
@@ -86,6 +88,15 @@ final recentSearchRepositoryProvider = Provider<RecentSearchRepository>((
   Ref ref,
 ) {
   return RecentSearchRepositoryImpl(database: ref.watch(appDatabaseProvider));
+});
+
+final readingHistoryRepositoryProvider = Provider<ReadingHistoryRepository>((
+  Ref ref,
+) {
+  return ReadingHistoryRepositoryImpl(
+    database: ref.watch(appDatabaseProvider),
+    local: ref.watch(newsLocalDataSourceProvider),
+  );
 });
 
 final newsRepositoryProvider = Provider<NewsRepository>((Ref ref) {
@@ -146,5 +157,55 @@ class ThemeModeController extends Notifier<ThemeMode> {
       'dark' => ThemeMode.dark,
       _ => ThemeMode.system,
     };
+  }
+}
+
+/// Reader's own text-size multiplier for article body copy.
+///
+/// Combined with — never a replacement for — the system text scale. See
+/// [ReadingTextScaleController.steps] for the allowed values.
+final readingTextScaleProvider =
+    NotifierProvider<ReadingTextScaleController, double>(
+      ReadingTextScaleController.new,
+    );
+
+class ReadingTextScaleController extends Notifier<double> {
+  /// Discrete steps rather than free scaling, so body copy cannot be nudged
+  /// into a size that breaks the layout.
+  static const List<double> steps = <double>[0.9, 1, 1.15, 1.3, 1.5];
+
+  static const double defaultScale = 1;
+
+  @override
+  double build() {
+    final double? stored = ref
+        .read(settingsStoreProvider)
+        .readReadingTextScale();
+    // An unknown stored value snaps to the nearest allowed step rather than
+    // being trusted blindly.
+    return stored == null ? defaultScale : nearestStep(stored);
+  }
+
+  bool get canIncrease => state < steps.last;
+  bool get canDecrease => state > steps.first;
+
+  void increase() => _moveBy(1);
+  void decrease() => _moveBy(-1);
+
+  void _moveBy(int delta) {
+    final int index = steps.indexOf(state);
+    final int next = (index + delta).clamp(0, steps.length - 1);
+    if (next == index) return;
+    state = steps[next];
+    // Best effort: failing to persist a preference must not break reading.
+    ref.read(settingsStoreProvider).writeReadingTextScale(state);
+  }
+
+  static double nearestStep(double value) {
+    double best = steps.first;
+    for (final double step in steps) {
+      if ((step - value).abs() < (best - value).abs()) best = step;
+    }
+    return best;
   }
 }
