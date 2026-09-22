@@ -13,6 +13,7 @@ import 'package:news_app/features/news/domain/entities/article.dart';
 import 'package:news_app/features/news/domain/entities/article_feed.dart';
 import 'package:news_app/features/news/domain/entities/news_category.dart';
 import 'package:news_app/features/news/domain/repositories/news_repository.dart';
+import 'package:news_app/features/search/domain/entities/search_sort.dart';
 
 /// Default page size for every paginated request.
 const int kNewsPageSize = 20;
@@ -148,6 +149,7 @@ class NewsRepositoryImpl implements NewsRepository {
   Future<ArticleFeed> searchArticles({
     required String query,
     int page = 1,
+    SearchSort sort = SearchSort.fallback,
   }) async {
     final String trimmed = query.trim();
     if (trimmed.isEmpty) {
@@ -165,6 +167,7 @@ class NewsRepositoryImpl implements NewsRepository {
         query: trimmed,
         page: page,
         pageSize: _pageSize,
+        sortBy: sort.apiValue,
       );
 
       return ArticleFeed(

@@ -9,7 +9,7 @@
 /// appDatabaseProvider ───► newsLocalDataSourceProvider ──┴─► newsRepositoryProvider
 ///                                                                   │
 ///                         newsFeedControllerProvider ◄──────────────┤
-///                         searchControllerProvider   ◄──────────────┘
+///                         discoverControllerProvider ◄──────────────┘
 /// ```
 ///
 /// Nothing constructs its own collaborators; tests override the providers they
@@ -29,6 +29,8 @@ import 'package:news_app/features/news/data/datasources/news_remote_data_source.
 import 'package:news_app/features/news/data/repositories/news_repository_impl.dart';
 import 'package:news_app/features/news/domain/entities/news_category.dart';
 import 'package:news_app/features/news/domain/repositories/news_repository.dart';
+import 'package:news_app/features/search/data/repositories/recent_search_repository_impl.dart';
+import 'package:news_app/features/search/domain/repositories/recent_search_repository.dart';
 
 /// Thrown by a provider that bootstrap is required to override.
 Never _missingOverride(String name) {
@@ -79,6 +81,12 @@ final newsRemoteDataSourceProvider = Provider<NewsRemoteDataSource>((Ref ref) {
 final newsLocalDataSourceProvider = Provider<NewsLocalDataSource>(
   (Ref ref) => NewsLocalDataSource(ref.watch(appDatabaseProvider)),
 );
+
+final recentSearchRepositoryProvider = Provider<RecentSearchRepository>((
+  Ref ref,
+) {
+  return RecentSearchRepositoryImpl(database: ref.watch(appDatabaseProvider));
+});
 
 final newsRepositoryProvider = Provider<NewsRepository>((Ref ref) {
   return NewsRepositoryImpl(

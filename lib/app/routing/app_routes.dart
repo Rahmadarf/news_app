@@ -16,10 +16,6 @@ abstract final class AppRoutes {
   static const String settingsName = 'settings';
   static const String settingsPath = '/settings';
 
-  /// Carries the search term in `?q=`.
-  static const String searchName = 'search';
-  static const String searchPath = '/search';
-
   /// Carries the canonical article URL in `?url=`.
   static const String articleName = 'article';
   static const String articlePath = '/article';
@@ -27,8 +23,9 @@ abstract final class AppRoutes {
   static const String queryParam = 'q';
   static const String urlParam = 'url';
 
-  static String search(String query) => Uri(
-    path: searchPath,
+  /// Discover with a pre-filled term, for deep links.
+  static String discoverWithQuery(String query) => Uri(
+    path: discoverPath,
     queryParameters: <String, String>{queryParam: query},
   ).toString();
 

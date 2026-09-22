@@ -61,11 +61,13 @@ class NewsApiDataSource implements NewsRemoteDataSource {
     required String query,
     required int page,
     required int pageSize,
+    String? sortBy,
   }) {
     return _get(everythingPath, <String, String>{
       'q': query,
       'page': '$page',
       'pageSize': '$pageSize',
+      'sortBy': ?sortBy,
     });
   }
 

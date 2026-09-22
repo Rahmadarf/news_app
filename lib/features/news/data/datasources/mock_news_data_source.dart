@@ -48,6 +48,7 @@ class MockNewsDataSource implements NewsRemoteDataSource {
     required String query,
     required int page,
     required int pageSize,
+    String? sortBy,
   }) async {
     final List<ArticleDto> all = await _read(searchFixture);
 

@@ -1,28 +1,21 @@
 {
   "@@locale": "id",
-
   "appName": "Newsline",
-
   "homeTab": "Home",
   "discoverTab": "Discover",
   "bookmarkTab": "Bookmark",
   "settingsTab": "Settings",
-
   "greetingMorning": "Selamat pagi,",
   "greetingAfternoon": "Selamat siang,",
   "greetingEvening": "Selamat malam,",
   "greetingReader": "Pembaca",
-
   "notificationsLabel": "Notifikasi",
   "searchLabel": "Cari berita",
-
   "trendingTodayTitle": "Trending today",
   "recentStoriesTitle": "Recent stories",
   "seeAllAction": "Lihat semua",
-
   "loadMoreAction": "Muat berita lainnya",
   "homeFooterTagline": "Sebuah perspektif baru, setiap hari.",
-
   "categoryAll": "Semua",
   "categoryGeneral": "Umum",
   "categoryTechnology": "Teknologi",
@@ -31,23 +24,17 @@
   "categoryHealth": "Kesehatan",
   "categoryScience": "Sains",
   "categoryEntertainment": "Hiburan",
-
   "saveArticle": "Simpan artikel",
   "removeFromSaved": "Hapus dari simpanan",
   "articleSaved": "Artikel disimpan",
   "articleUnsaved": "Artikel dihapus dari simpanan",
-
   "readArticleLabel": "Baca {title}",
-
   "offlineBanner": "Anda offline · menampilkan berita tersimpan",
   "lastUpdatedLabel": "Diperbarui {time}",
-
   "retryAction": "Coba lagi",
   "exploreAction": "Jelajahi berita",
-
   "emptyFeedTitle": "Belum ada cerita di sini",
   "emptyFeedBody": "Coba topik lain untuk menemukan perspektif baru.",
-
   "errorNoConnectionTitle": "Anda sedang offline",
   "errorNoConnectionBody": "Periksa koneksi Anda lalu coba lagi.",
   "errorTimeoutTitle": "Permintaan terlalu lama",
@@ -68,12 +55,21 @@
   "errorConfigurationBody": "Build ini belum memiliki konfigurasi berita.",
   "errorUnknownTitle": "Terjadi kesalahan",
   "errorUnknownBody": "Silakan coba lagi.",
-
   "loadingStories": "Memuat berita",
   "sampleDataNotice": "Konten editorial contoh untuk peninjauan desain.",
-
   "comingSoonTitle": "Belum dibuat",
   "comingSoonBody": "Layar ini hadir pada tahap desain berikutnya.",
-
-  "unknownSource": "Sumber tidak diketahui"
+  "unknownSource": "Sumber tidak diketahui",
+  "searchHint": "Cari cerita, topik, perspektif...",
+  "clearSearchAction": "Hapus pencarian",
+  "clearAction": "Hapus",
+  "recentSearchesTitle": "Recent searches",
+  "removeRecentSearch": "Hapus dari pencarian terakhir",
+  "exploreTopicsTitle": "Explore topics",
+  "searchEmptyTitle": "Belum ditemukan",
+  "searchEmptyBody": "Coba kata lain, misalnya nama kota, topik, atau sumber.",
+  "sortRelevancy": "Paling relevan",
+  "sortNewest": "Terbaru",
+  "sortPopularity": "Populer",
+  "searchResultCount": "{count, plural, =0{Nol cerita} other{{count} cerita}}"
 }

@@ -198,4 +198,50 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unknownSource => 'Unknown source';
+
+  @override
+  String get searchHint => 'Search stories, topics, perspectives...';
+
+  @override
+  String get clearSearchAction => 'Clear search';
+
+  @override
+  String get clearAction => 'Clear';
+
+  @override
+  String get recentSearchesTitle => 'Recent searches';
+
+  @override
+  String get removeRecentSearch => 'Remove from recent searches';
+
+  @override
+  String get exploreTopicsTitle => 'Explore topics';
+
+  @override
+  String get searchEmptyTitle => 'Nothing found';
+
+  @override
+  String get searchEmptyBody =>
+      'Try a different term, such as a city, a topic, or a source.';
+
+  @override
+  String get sortRelevancy => 'Most relevant';
+
+  @override
+  String get sortNewest => 'Newest';
+
+  @override
+  String get sortPopularity => 'Popular';
+
+  @override
+  String searchResultCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stories',
+      one: '1 story',
+      zero: 'No stories',
+    );
+    return '$_temp0';
+  }
 }

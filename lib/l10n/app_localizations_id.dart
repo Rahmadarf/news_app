@@ -199,4 +199,49 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get unknownSource => 'Sumber tidak diketahui';
+
+  @override
+  String get searchHint => 'Cari cerita, topik, perspektif...';
+
+  @override
+  String get clearSearchAction => 'Hapus pencarian';
+
+  @override
+  String get clearAction => 'Hapus';
+
+  @override
+  String get recentSearchesTitle => 'Recent searches';
+
+  @override
+  String get removeRecentSearch => 'Hapus dari pencarian terakhir';
+
+  @override
+  String get exploreTopicsTitle => 'Explore topics';
+
+  @override
+  String get searchEmptyTitle => 'Belum ditemukan';
+
+  @override
+  String get searchEmptyBody =>
+      'Coba kata lain, misalnya nama kota, topik, atau sumber.';
+
+  @override
+  String get sortRelevancy => 'Paling relevan';
+
+  @override
+  String get sortNewest => 'Terbaru';
+
+  @override
+  String get sortPopularity => 'Populer';
+
+  @override
+  String searchResultCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cerita',
+      zero: 'Nol cerita',
+    );
+    return '$_temp0';
+  }
 }

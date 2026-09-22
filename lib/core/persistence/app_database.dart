@@ -74,7 +74,11 @@ class ReadingHistoryEntries extends Table {
   Set<Column<Object>> get primaryKey => <Column<Object>>{articleUrl};
 }
 
-/// Groundwork for recent searches. No UI reads this yet.
+/// Recently submitted search terms, most recent first.
+///
+/// The explicit data-class name avoids Drift's awkward singularisation of
+/// "RecentSearches".
+@DataClassName('RecentSearchEntry')
 class RecentSearches extends Table {
   TextColumn get query => text()();
   DateTimeColumn get searchedAt => dateTime()();

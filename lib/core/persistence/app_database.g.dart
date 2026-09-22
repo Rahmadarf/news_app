@@ -1676,7 +1676,7 @@ class ReadingHistoryEntriesCompanion
 }
 
 class $RecentSearchesTable extends RecentSearches
-    with TableInfo<$RecentSearchesTable, RecentSearche> {
+    with TableInfo<$RecentSearchesTable, RecentSearchEntry> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -1710,7 +1710,7 @@ class $RecentSearchesTable extends RecentSearches
   static const String $name = 'recent_searches';
   @override
   VerificationContext validateIntegrity(
-    Insertable<RecentSearche> instance, {
+    Insertable<RecentSearchEntry> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -1737,9 +1737,9 @@ class $RecentSearchesTable extends RecentSearches
   @override
   Set<GeneratedColumn> get $primaryKey => {query};
   @override
-  RecentSearche map(Map<String, dynamic> data, {String? tablePrefix}) {
+  RecentSearchEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return RecentSearche(
+    return RecentSearchEntry(
       query: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}query'],
@@ -1757,10 +1757,11 @@ class $RecentSearchesTable extends RecentSearches
   }
 }
 
-class RecentSearche extends DataClass implements Insertable<RecentSearche> {
+class RecentSearchEntry extends DataClass
+    implements Insertable<RecentSearchEntry> {
   final String query;
   final DateTime searchedAt;
-  const RecentSearche({required this.query, required this.searchedAt});
+  const RecentSearchEntry({required this.query, required this.searchedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1776,12 +1777,12 @@ class RecentSearche extends DataClass implements Insertable<RecentSearche> {
     );
   }
 
-  factory RecentSearche.fromJson(
+  factory RecentSearchEntry.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return RecentSearche(
+    return RecentSearchEntry(
       query: serializer.fromJson<String>(json['query']),
       searchedAt: serializer.fromJson<DateTime>(json['searchedAt']),
     );
@@ -1795,13 +1796,13 @@ class RecentSearche extends DataClass implements Insertable<RecentSearche> {
     };
   }
 
-  RecentSearche copyWith({String? query, DateTime? searchedAt}) =>
-      RecentSearche(
+  RecentSearchEntry copyWith({String? query, DateTime? searchedAt}) =>
+      RecentSearchEntry(
         query: query ?? this.query,
         searchedAt: searchedAt ?? this.searchedAt,
       );
-  RecentSearche copyWithCompanion(RecentSearchesCompanion data) {
-    return RecentSearche(
+  RecentSearchEntry copyWithCompanion(RecentSearchesCompanion data) {
+    return RecentSearchEntry(
       query: data.query.present ? data.query.value : this.query,
       searchedAt: data.searchedAt.present
           ? data.searchedAt.value
@@ -1811,7 +1812,7 @@ class RecentSearche extends DataClass implements Insertable<RecentSearche> {
 
   @override
   String toString() {
-    return (StringBuffer('RecentSearche(')
+    return (StringBuffer('RecentSearchEntry(')
           ..write('query: $query, ')
           ..write('searchedAt: $searchedAt')
           ..write(')'))
@@ -1823,12 +1824,12 @@ class RecentSearche extends DataClass implements Insertable<RecentSearche> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is RecentSearche &&
+      (other is RecentSearchEntry &&
           other.query == this.query &&
           other.searchedAt == this.searchedAt);
 }
 
-class RecentSearchesCompanion extends UpdateCompanion<RecentSearche> {
+class RecentSearchesCompanion extends UpdateCompanion<RecentSearchEntry> {
   final Value<String> query;
   final Value<DateTime> searchedAt;
   final Value<int> rowid;
@@ -1843,7 +1844,7 @@ class RecentSearchesCompanion extends UpdateCompanion<RecentSearche> {
     this.rowid = const Value.absent(),
   }) : query = Value(query),
        searchedAt = Value(searchedAt);
-  static Insertable<RecentSearche> custom({
+  static Insertable<RecentSearchEntry> custom({
     Expression<String>? query,
     Expression<DateTime>? searchedAt,
     Expression<int>? rowid,
@@ -3664,17 +3665,21 @@ class $$RecentSearchesTableTableManager
         RootTableManager<
           _$AppDatabase,
           $RecentSearchesTable,
-          RecentSearche,
+          RecentSearchEntry,
           $$RecentSearchesTableFilterComposer,
           $$RecentSearchesTableOrderingComposer,
           $$RecentSearchesTableAnnotationComposer,
           $$RecentSearchesTableCreateCompanionBuilder,
           $$RecentSearchesTableUpdateCompanionBuilder,
           (
-            RecentSearche,
-            BaseReferences<_$AppDatabase, $RecentSearchesTable, RecentSearche>,
+            RecentSearchEntry,
+            BaseReferences<
+              _$AppDatabase,
+              $RecentSearchesTable,
+              RecentSearchEntry
+            >,
           ),
-          RecentSearche,
+          RecentSearchEntry,
           PrefetchHooks Function()
         > {
   $$RecentSearchesTableTableManager(
@@ -3713,11 +3718,11 @@ class $$RecentSearchesTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$RecentSearchesTable, RecentSearche>(table),
+                  e.readTable<$RecentSearchesTable, RecentSearchEntry>(table),
                   BaseReferences<
                     _$AppDatabase,
                     $RecentSearchesTable,
-                    RecentSearche
+                    RecentSearchEntry
                   >(db, table, e),
                 ),
               )
@@ -3731,17 +3736,17 @@ typedef $$RecentSearchesTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $RecentSearchesTable,
-      RecentSearche,
+      RecentSearchEntry,
       $$RecentSearchesTableFilterComposer,
       $$RecentSearchesTableOrderingComposer,
       $$RecentSearchesTableAnnotationComposer,
       $$RecentSearchesTableCreateCompanionBuilder,
       $$RecentSearchesTableUpdateCompanionBuilder,
       (
-        RecentSearche,
-        BaseReferences<_$AppDatabase, $RecentSearchesTable, RecentSearche>,
+        RecentSearchEntry,
+        BaseReferences<_$AppDatabase, $RecentSearchesTable, RecentSearchEntry>,
       ),
-      RecentSearche,
+      RecentSearchEntry,
       PrefetchHooks Function()
     >;
 

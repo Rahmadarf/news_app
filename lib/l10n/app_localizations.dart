@@ -457,6 +457,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unknown source'**
   String get unknownSource;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search stories, topics, perspectives...'**
+  String get searchHint;
+
+  /// No description provided for @clearSearchAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get clearSearchAction;
+
+  /// No description provided for @clearAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clearAction;
+
+  /// No description provided for @recentSearchesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent searches'**
+  String get recentSearchesTitle;
+
+  /// No description provided for @removeRecentSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from recent searches'**
+  String get removeRecentSearch;
+
+  /// No description provided for @exploreTopicsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore topics'**
+  String get exploreTopicsTitle;
+
+  /// No description provided for @searchEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing found'**
+  String get searchEmptyTitle;
+
+  /// No description provided for @searchEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Try a different term, such as a city, a topic, or a source.'**
+  String get searchEmptyBody;
+
+  /// No description provided for @sortRelevancy.
+  ///
+  /// In en, this message translates to:
+  /// **'Most relevant'**
+  String get sortRelevancy;
+
+  /// No description provided for @sortNewest.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest'**
+  String get sortNewest;
+
+  /// No description provided for @sortPopularity.
+  ///
+  /// In en, this message translates to:
+  /// **'Popular'**
+  String get sortPopularity;
+
+  /// No description provided for @searchResultCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No stories} =1{1 story} other{{count} stories}}'**
+  String searchResultCount(int count);
 }
 
 class _AppLocalizationsDelegate

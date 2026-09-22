@@ -139,7 +139,7 @@ class _Feed extends ConsumerWidget {
             child: SectionHeader(
               title: l10n.trendingTodayTitle,
               trailing: TextButton(
-                onPressed: () => context.push(AppRoutes.searchPath),
+                onPressed: () => context.go(AppRoutes.discoverPath),
                 child: Text('${l10n.seeAllAction} ↗'),
               ),
             ),
@@ -150,7 +150,7 @@ class _Feed extends ConsumerWidget {
           child: SectionHeader(
             title: l10n.recentStoriesTitle,
             trailing: IconButton(
-              onPressed: () => context.push(AppRoutes.searchPath),
+              onPressed: () => context.go(AppRoutes.discoverPath),
               tooltip: l10n.searchLabel,
               icon: const Icon(Icons.search),
             ),

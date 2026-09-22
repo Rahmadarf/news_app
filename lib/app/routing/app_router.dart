@@ -5,7 +5,7 @@ import 'package:news_app/app/widgets/home_shell.dart';
 import 'package:news_app/features/article_detail/presentation/pages/article_detail_page.dart';
 import 'package:news_app/features/news/domain/entities/article.dart';
 import 'package:news_app/features/news/presentation/pages/news_feed_page.dart';
-import 'package:news_app/features/search/presentation/pages/search_results_page.dart';
+import 'package:news_app/features/search/presentation/pages/discover_page.dart';
 import 'package:news_app/l10n/app_localizations.dart';
 
 /// Builds the application router.
@@ -50,9 +50,7 @@ GoRouter createRouter({String? initialLocation}) {
                 name: AppRoutes.discoverName,
                 path: AppRoutes.discoverPath,
                 builder: (BuildContext context, GoRouterState state) =>
-                    ComingSoonPage(
-                      title: AppLocalizations.of(context).discoverTab,
-                    ),
+                    const DiscoverPage(),
               ),
             ],
           ),
@@ -81,16 +79,6 @@ GoRouter createRouter({String? initialLocation}) {
             ],
           ),
         ],
-      ),
-      GoRoute(
-        name: AppRoutes.searchName,
-        path: AppRoutes.searchPath,
-        parentNavigatorKey: rootNavigatorKey,
-        builder: (BuildContext context, GoRouterState state) {
-          final String query =
-              state.uri.queryParameters[AppRoutes.queryParam]?.trim() ?? '';
-          return SearchResultsPage(query: query);
-        },
       ),
       GoRoute(
         name: AppRoutes.articleName,

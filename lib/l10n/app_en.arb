@@ -1,31 +1,30 @@
 {
   "@@locale": "en",
-
   "appName": "Newsline",
-  "@appName": { "description": "Working product name, matching the approved design references." },
-
+  "@appName": {
+    "description": "Working product name, matching the approved design references."
+  },
   "homeTab": "Home",
   "discoverTab": "Discover",
   "bookmarkTab": "Bookmark",
   "settingsTab": "Settings",
-
   "greetingMorning": "Good morning,",
   "greetingAfternoon": "Good afternoon,",
   "greetingEvening": "Good evening,",
   "greetingReader": "Reader",
-  "@greetingReader": { "description": "Placeholder name shown until a local reader identity exists." },
-
+  "@greetingReader": {
+    "description": "Placeholder name shown until a local reader identity exists."
+  },
   "notificationsLabel": "Notifications",
   "searchLabel": "Search news",
-
   "trendingTodayTitle": "Trending today",
-  "@trendingTodayTitle": { "description": "English section label carried over from the design references." },
+  "@trendingTodayTitle": {
+    "description": "English section label carried over from the design references."
+  },
   "recentStoriesTitle": "Recent stories",
   "seeAllAction": "See all",
-
   "loadMoreAction": "Load more stories",
   "homeFooterTagline": "A fresh perspective, every day.",
-
   "categoryAll": "All",
   "categoryGeneral": "General",
   "categoryTechnology": "Technology",
@@ -34,29 +33,31 @@
   "categoryHealth": "Health",
   "categoryScience": "Science",
   "categoryEntertainment": "Entertainment",
-
   "saveArticle": "Save article",
   "removeFromSaved": "Remove from saved",
   "articleSaved": "Article saved",
   "articleUnsaved": "Article removed from saved",
-
   "readArticleLabel": "Read {title}",
   "@readArticleLabel": {
-    "placeholders": { "title": { "type": "String" } }
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
   },
-
   "offlineBanner": "You are offline · showing saved stories",
   "lastUpdatedLabel": "Updated {time}",
   "@lastUpdatedLabel": {
-    "placeholders": { "time": { "type": "String" } }
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   },
-
   "retryAction": "Try again",
   "exploreAction": "Explore news",
-
   "emptyFeedTitle": "No stories here yet",
   "emptyFeedBody": "Try another topic to find a new perspective.",
-
   "errorNoConnectionTitle": "You are offline",
   "errorNoConnectionBody": "Check your connection and try again.",
   "errorTimeoutTitle": "That took too long",
@@ -77,13 +78,31 @@
   "errorConfigurationBody": "This build is missing its news configuration.",
   "errorUnknownTitle": "Something went wrong",
   "errorUnknownBody": "Please try again.",
-
   "loadingStories": "Loading stories",
   "sampleDataNotice": "Sample editorial content for design review.",
-  "@sampleDataNotice": { "description": "Shown while the app runs on bundled mock fixtures." },
-
+  "@sampleDataNotice": {
+    "description": "Shown while the app runs on bundled mock fixtures."
+  },
   "comingSoonTitle": "Not built yet",
   "comingSoonBody": "This screen arrives in a later stage of the design work.",
-
-  "unknownSource": "Unknown source"
+  "unknownSource": "Unknown source",
+  "searchHint": "Search stories, topics, perspectives...",
+  "clearSearchAction": "Clear search",
+  "clearAction": "Clear",
+  "recentSearchesTitle": "Recent searches",
+  "removeRecentSearch": "Remove from recent searches",
+  "exploreTopicsTitle": "Explore topics",
+  "searchEmptyTitle": "Nothing found",
+  "searchEmptyBody": "Try a different term, such as a city, a topic, or a source.",
+  "sortRelevancy": "Most relevant",
+  "sortNewest": "Newest",
+  "sortPopularity": "Popular",
+  "searchResultCount": "{count, plural, =0{No stories} =1{1 story} other{{count} stories}}",
+  "@searchResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }
