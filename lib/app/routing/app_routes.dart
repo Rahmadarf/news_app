@@ -7,6 +7,16 @@ abstract final class AppRoutes {
   static const String feedName = 'feed';
   static const String feedPath = '/';
 
+  static const String discoverName = 'discover';
+  static const String discoverPath = '/discover';
+
+  static const String bookmarksName = 'bookmarks';
+  static const String bookmarksPath = '/bookmarks';
+
+  static const String settingsName = 'settings';
+  static const String settingsPath = '/settings';
+
+  /// Carries the search term in `?q=`.
   static const String searchName = 'search';
   static const String searchPath = '/search';
 
@@ -14,10 +24,7 @@ abstract final class AppRoutes {
   static const String articleName = 'article';
   static const String articlePath = '/article';
 
-  /// Query parameter holding the search term.
   static const String queryParam = 'q';
-
-  /// Query parameter holding the canonical article URL.
   static const String urlParam = 'url';
 
   static String search(String query) => Uri(

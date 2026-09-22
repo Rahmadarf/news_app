@@ -1,0 +1,79 @@
+{
+  "@@locale": "id",
+
+  "appName": "Newsline",
+
+  "homeTab": "Home",
+  "discoverTab": "Discover",
+  "bookmarkTab": "Bookmark",
+  "settingsTab": "Settings",
+
+  "greetingMorning": "Selamat pagi,",
+  "greetingAfternoon": "Selamat siang,",
+  "greetingEvening": "Selamat malam,",
+  "greetingReader": "Pembaca",
+
+  "notificationsLabel": "Notifikasi",
+  "searchLabel": "Cari berita",
+
+  "trendingTodayTitle": "Trending today",
+  "recentStoriesTitle": "Recent stories",
+  "seeAllAction": "Lihat semua",
+
+  "loadMoreAction": "Muat berita lainnya",
+  "homeFooterTagline": "Sebuah perspektif baru, setiap hari.",
+
+  "categoryAll": "Semua",
+  "categoryGeneral": "Umum",
+  "categoryTechnology": "Teknologi",
+  "categoryBusiness": "Bisnis",
+  "categorySports": "Olahraga",
+  "categoryHealth": "Kesehatan",
+  "categoryScience": "Sains",
+  "categoryEntertainment": "Hiburan",
+
+  "saveArticle": "Simpan artikel",
+  "removeFromSaved": "Hapus dari simpanan",
+  "articleSaved": "Artikel disimpan",
+  "articleUnsaved": "Artikel dihapus dari simpanan",
+
+  "readArticleLabel": "Baca {title}",
+
+  "offlineBanner": "Anda offline · menampilkan berita tersimpan",
+  "lastUpdatedLabel": "Diperbarui {time}",
+
+  "retryAction": "Coba lagi",
+  "exploreAction": "Jelajahi berita",
+
+  "emptyFeedTitle": "Belum ada cerita di sini",
+  "emptyFeedBody": "Coba topik lain untuk menemukan perspektif baru.",
+
+  "errorNoConnectionTitle": "Anda sedang offline",
+  "errorNoConnectionBody": "Periksa koneksi Anda lalu coba lagi.",
+  "errorTimeoutTitle": "Permintaan terlalu lama",
+  "errorTimeoutBody": "Layanan tidak merespons tepat waktu.",
+  "errorUnauthorizedTitle": "Akses ditolak",
+  "errorUnauthorizedBody": "Layanan berita menolak kredensial aplikasi ini.",
+  "errorRateLimitedTitle": "Terlalu banyak permintaan",
+  "errorRateLimitedBody": "Layanan berita sedang membatasi kami. Coba lagi nanti.",
+  "errorUpgradeRequiredTitle": "Tidak tersedia pada paket ini",
+  "errorUpgradeRequiredBody": "Layanan berita tidak mengizinkan permintaan ini.",
+  "errorServerTitle": "Layanan tidak tersedia",
+  "errorServerBody": "Layanan berita sedang bermasalah. Coba lagi nanti.",
+  "errorMalformedTitle": "Respons tidak terduga",
+  "errorMalformedBody": "Layanan berita mengirim data yang tidak dapat kami baca.",
+  "errorCacheTitle": "Masalah penyimpanan",
+  "errorCacheBody": "Berita tersimpan tidak dapat dibaca.",
+  "errorConfigurationTitle": "Aplikasi belum dikonfigurasi",
+  "errorConfigurationBody": "Build ini belum memiliki konfigurasi berita.",
+  "errorUnknownTitle": "Terjadi kesalahan",
+  "errorUnknownBody": "Silakan coba lagi.",
+
+  "loadingStories": "Memuat berita",
+  "sampleDataNotice": "Konten editorial contoh untuk peninjauan desain.",
+
+  "comingSoonTitle": "Belum dibuat",
+  "comingSoonBody": "Layar ini hadir pada tahap desain berikutnya.",
+
+  "unknownSource": "Sumber tidak diketahui"
+}

@@ -1,20 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:news_app/app/di/providers.dart';
 import 'package:news_app/app/routing/app_router.dart';
 import 'package:news_app/core/config/app_config.dart';
-import 'package:news_app/core/theme/app_colors.dart';
 import 'package:news_app/core/theme/app_theme.dart';
+import 'package:news_app/core/theme/newsline_tokens.dart';
+import 'package:news_app/l10n/app_localizations.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 /// The application shell. Holds the router for the lifetime of the app.
-class NewsApp extends StatefulWidget {
+class NewsApp extends ConsumerStatefulWidget {
   const NewsApp({super.key});
 
   @override
-  State<NewsApp> createState() => _NewsAppState();
+  ConsumerState<NewsApp> createState() => _NewsAppState();
 }
 
-class _NewsAppState extends State<NewsApp> {
+class _NewsAppState extends ConsumerState<NewsApp> {
   late final GoRouter _router = createRouter();
+
+  @override
+  void initState() {
+    super.initState();
+    // Relative timestamps ("28 menit lalu") need the Indonesian messages
+    // registered before the first frame renders one.
+    timeago.setLocaleMessages('id', timeago.IdMessages());
+  }
 
   @override
   void dispose() {
@@ -25,18 +37,38 @@ class _NewsAppState extends State<NewsApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'News App',
+      onGenerateTitle: (BuildContext context) =>
+          AppLocalizations.of(context).appName,
       theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: ref.watch(themeModeProvider),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      localeListResolutionCallback: _resolveLocale,
       routerConfig: _router,
       debugShowCheckedModeBanner: false,
     );
+  }
+
+  /// Indonesian is the product default; English is used only when the device
+  /// asks for it explicitly.
+  static Locale _resolveLocale(
+    List<Locale>? deviceLocales,
+    Iterable<Locale> supported,
+  ) {
+    for (final Locale locale in deviceLocales ?? const <Locale>[]) {
+      for (final Locale candidate in supported) {
+        if (candidate.languageCode == locale.languageCode) return candidate;
+      }
+    }
+    return const Locale('id');
   }
 }
 
 /// Shown instead of the app when the compile-time configuration is unusable.
 ///
-/// Copy here is developer-facing on purpose; this screen is unreachable in a
-/// correctly configured build.
+/// Copy here is developer-facing on purpose and deliberately unlocalized; this
+/// screen is unreachable in a correctly configured build.
 class ConfigurationErrorApp extends StatelessWidget {
   const ConfigurationErrorApp({super.key, required this.error});
 
@@ -47,42 +79,44 @@ class ConfigurationErrorApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
-      home: Scaffold(
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                const Icon(
-                  Icons.settings_suggest_outlined,
-                  size: 64,
-                  color: AppColors.error,
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Configuration error',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+      darkTheme: AppTheme.dark,
+      home: Builder(
+        builder: (BuildContext context) {
+          final NewslineTokens tokens = NewslineTokens.of(context);
+          final TextTheme text = Theme.of(context).textTheme;
+
+          return Scaffold(
+            body: SafeArea(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(Spacing.xl),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Icon(
+                        Icons.settings_suggest_outlined,
+                        size: 64,
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                      const SizedBox(height: Spacing.lg),
+                      Text('Configuration error', style: text.headlineMedium),
+                      const SizedBox(height: Spacing.md),
+                      Text(error.summary, style: text.bodySmall),
+                      const SizedBox(height: Spacing.md),
+                      Text(
+                        error.remedy,
+                        style: text.bodySmall?.copyWith(
+                          color: tokens.textSecondary,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  error.summary,
-                  style: const TextStyle(color: AppColors.textPrimary),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  error.remedy,
-                  style: const TextStyle(color: AppColors.textSecondary),
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }

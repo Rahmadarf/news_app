@@ -1,0 +1,89 @@
+{
+  "@@locale": "en",
+
+  "appName": "Newsline",
+  "@appName": { "description": "Working product name, matching the approved design references." },
+
+  "homeTab": "Home",
+  "discoverTab": "Discover",
+  "bookmarkTab": "Bookmark",
+  "settingsTab": "Settings",
+
+  "greetingMorning": "Good morning,",
+  "greetingAfternoon": "Good afternoon,",
+  "greetingEvening": "Good evening,",
+  "greetingReader": "Reader",
+  "@greetingReader": { "description": "Placeholder name shown until a local reader identity exists." },
+
+  "notificationsLabel": "Notifications",
+  "searchLabel": "Search news",
+
+  "trendingTodayTitle": "Trending today",
+  "@trendingTodayTitle": { "description": "English section label carried over from the design references." },
+  "recentStoriesTitle": "Recent stories",
+  "seeAllAction": "See all",
+
+  "loadMoreAction": "Load more stories",
+  "homeFooterTagline": "A fresh perspective, every day.",
+
+  "categoryAll": "All",
+  "categoryGeneral": "General",
+  "categoryTechnology": "Technology",
+  "categoryBusiness": "Business",
+  "categorySports": "Sports",
+  "categoryHealth": "Health",
+  "categoryScience": "Science",
+  "categoryEntertainment": "Entertainment",
+
+  "saveArticle": "Save article",
+  "removeFromSaved": "Remove from saved",
+  "articleSaved": "Article saved",
+  "articleUnsaved": "Article removed from saved",
+
+  "readArticleLabel": "Read {title}",
+  "@readArticleLabel": {
+    "placeholders": { "title": { "type": "String" } }
+  },
+
+  "offlineBanner": "You are offline · showing saved stories",
+  "lastUpdatedLabel": "Updated {time}",
+  "@lastUpdatedLabel": {
+    "placeholders": { "time": { "type": "String" } }
+  },
+
+  "retryAction": "Try again",
+  "exploreAction": "Explore news",
+
+  "emptyFeedTitle": "No stories here yet",
+  "emptyFeedBody": "Try another topic to find a new perspective.",
+
+  "errorNoConnectionTitle": "You are offline",
+  "errorNoConnectionBody": "Check your connection and try again.",
+  "errorTimeoutTitle": "That took too long",
+  "errorTimeoutBody": "The service did not respond in time.",
+  "errorUnauthorizedTitle": "Access denied",
+  "errorUnauthorizedBody": "The news service rejected this app's credentials.",
+  "errorRateLimitedTitle": "Too many requests",
+  "errorRateLimitedBody": "The news service is limiting us. Try again later.",
+  "errorUpgradeRequiredTitle": "Not available on this plan",
+  "errorUpgradeRequiredBody": "The news service does not allow this request.",
+  "errorServerTitle": "Service unavailable",
+  "errorServerBody": "The news service is having trouble. Try again later.",
+  "errorMalformedTitle": "Unexpected response",
+  "errorMalformedBody": "The news service sent something we could not read.",
+  "errorCacheTitle": "Storage problem",
+  "errorCacheBody": "Saved stories could not be read.",
+  "errorConfigurationTitle": "App is not configured",
+  "errorConfigurationBody": "This build is missing its news configuration.",
+  "errorUnknownTitle": "Something went wrong",
+  "errorUnknownBody": "Please try again.",
+
+  "loadingStories": "Loading stories",
+  "sampleDataNotice": "Sample editorial content for design review.",
+  "@sampleDataNotice": { "description": "Shown while the app runs on bundled mock fixtures." },
+
+  "comingSoonTitle": "Not built yet",
+  "comingSoonBody": "This screen arrives in a later stage of the design work.",
+
+  "unknownSource": "Unknown source"
+}

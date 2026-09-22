@@ -175,6 +175,16 @@ class NewsLocalDataSource {
     });
   }
 
+  /// Stores or refreshes a single article outside any feed page.
+  ///
+  /// Used when an article must outlive the feed cache — a bookmark, for
+  /// instance — without belonging to a cached page.
+  Future<void> upsertArticle(Article article) {
+    return _db
+        .into(_db.cachedArticles)
+        .insertOnConflictUpdate(_toCompanion(article));
+  }
+
   /// Looks one article up by canonical URL. Backs the article screen when it
   /// is reached by deep link and no object was handed over.
   Future<Article?> findByUrl(String url) async {

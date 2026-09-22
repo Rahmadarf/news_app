@@ -30,6 +30,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: any
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -78,8 +81,30 @@ flutter:
   #
   # Fixture di bawah hanya dipakai oleh MockNewsDataSource. Isinya data contoh
   # publik, bukan rahasia.
+  generate: true
+
   assets:
     - assets/fixtures/
+
+  fonts:
+    # SIL Open Font License 1.1. Lisensi lengkap ada di
+    # assets/fonts/OFL-DMSans.txt dan assets/fonts/OFL-PlayfairDisplay.txt.
+    - family: DMSans
+      fonts:
+        - asset: assets/fonts/DMSans-400.ttf
+          weight: 400
+        - asset: assets/fonts/DMSans-500.ttf
+          weight: 500
+        - asset: assets/fonts/DMSans-600.ttf
+          weight: 600
+        - asset: assets/fonts/DMSans-700.ttf
+          weight: 700
+    - family: PlayfairDisplay
+      fonts:
+        - asset: assets/fonts/PlayfairDisplay-600.ttf
+          weight: 600
+        - asset: assets/fonts/PlayfairDisplay-700.ttf
+          weight: 700
 
   # To add assets to your application, add an assets section, like this:
   # assets:

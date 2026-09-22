@@ -5,12 +5,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Deliberately separate from the Drift database: a toggle should not require
 /// a schema migration, and these values have no relational shape.
 ///
-/// Only the selected category is stored today. Theme, locale, and country join
-/// it when the settings feature lands.
+/// Holds the selected category and the theme preference today. Locale and
+/// country join them when the settings screen lands.
 class SettingsStore {
   const SettingsStore(this._prefs);
 
   static const String selectedCategoryKey = 'settings.selected_category';
+  static const String themeModeKey = 'settings.theme_mode';
 
   final SharedPreferences _prefs;
 
@@ -24,4 +25,11 @@ class SettingsStore {
 
   Future<void> writeSelectedCategory(String apiValue) =>
       _prefs.setString(selectedCategoryKey, apiValue);
+
+  /// Raw stored theme preference: `system`, `light`, or `dark`. `null` until
+  /// the reader chooses one.
+  String? readThemeMode() => _prefs.getString(themeModeKey);
+
+  Future<void> writeThemeMode(String value) =>
+      _prefs.setString(themeModeKey, value);
 }

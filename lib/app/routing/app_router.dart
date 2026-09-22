@@ -1,30 +1,91 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:news_app/app/routing/app_routes.dart';
+import 'package:news_app/app/widgets/home_shell.dart';
 import 'package:news_app/features/article_detail/presentation/pages/article_detail_page.dart';
 import 'package:news_app/features/news/domain/entities/article.dart';
 import 'package:news_app/features/news/presentation/pages/news_feed_page.dart';
 import 'package:news_app/features/search/presentation/pages/search_results_page.dart';
+import 'package:news_app/l10n/app_localizations.dart';
 
 /// Builds the application router.
 ///
+/// The four tabs live in a [StatefulShellRoute] so each keeps its own stack
+/// and scroll position. The article screen is pushed on the root navigator,
+/// which is what hides the bottom bar while reading.
+///
 /// Every argument is read defensively. `GoRouterState.extra` is `Object?` and
 /// is empty after a deep link, a hot restart, or a browser reload, so no
-/// builder casts it; the article screen falls back to its URL parameter
-/// instead of throwing. See docs/AUDIT.md H-10.
+/// builder casts it; the article screen falls back to its URL parameter and
+/// then to the local cache. See docs/AUDIT.md H-10.
 GoRouter createRouter({String? initialLocation}) {
+  final GlobalKey<NavigatorState> rootNavigatorKey =
+      GlobalKey<NavigatorState>();
+
   return GoRouter(
+    navigatorKey: rootNavigatorKey,
     initialLocation: initialLocation ?? AppRoutes.feedPath,
     routes: <RouteBase>[
-      GoRoute(
-        name: AppRoutes.feedName,
-        path: AppRoutes.feedPath,
-        builder: (BuildContext context, GoRouterState state) =>
-            const NewsFeedPage(),
+      StatefulShellRoute.indexedStack(
+        builder:
+            (
+              BuildContext context,
+              GoRouterState state,
+              StatefulNavigationShell navigationShell,
+            ) => HomeShell(navigationShell: navigationShell),
+        branches: <StatefulShellBranch>[
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                name: AppRoutes.feedName,
+                path: AppRoutes.feedPath,
+                builder: (BuildContext context, GoRouterState state) =>
+                    const NewsFeedPage(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                name: AppRoutes.discoverName,
+                path: AppRoutes.discoverPath,
+                builder: (BuildContext context, GoRouterState state) =>
+                    ComingSoonPage(
+                      title: AppLocalizations.of(context).discoverTab,
+                    ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                name: AppRoutes.bookmarksName,
+                path: AppRoutes.bookmarksPath,
+                builder: (BuildContext context, GoRouterState state) =>
+                    ComingSoonPage(
+                      title: AppLocalizations.of(context).bookmarkTab,
+                    ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                name: AppRoutes.settingsName,
+                path: AppRoutes.settingsPath,
+                builder: (BuildContext context, GoRouterState state) =>
+                    ComingSoonPage(
+                      title: AppLocalizations.of(context).settingsTab,
+                    ),
+              ),
+            ],
+          ),
+        ],
       ),
       GoRoute(
         name: AppRoutes.searchName,
         path: AppRoutes.searchPath,
+        parentNavigatorKey: rootNavigatorKey,
         builder: (BuildContext context, GoRouterState state) {
           final String query =
               state.uri.queryParameters[AppRoutes.queryParam]?.trim() ?? '';
@@ -34,6 +95,7 @@ GoRouter createRouter({String? initialLocation}) {
       GoRoute(
         name: AppRoutes.articleName,
         path: AppRoutes.articlePath,
+        parentNavigatorKey: rootNavigatorKey,
         builder: (BuildContext context, GoRouterState state) {
           // Checked, never cast: extra is a fast path, the URL is the contract.
           final Object? extra = state.extra;
@@ -58,14 +120,14 @@ class _RouteNotFoundPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Not found')),
+      appBar: AppBar(),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Text(
-            'No screen matches $location',
+            location,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyLarge,
+            style: Theme.of(context).textTheme.bodySmall,
           ),
         ),
       ),

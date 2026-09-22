@@ -16,6 +16,7 @@
 /// need and get the whole graph for free.
 library;
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:news_app/core/config/app_config.dart';
@@ -110,5 +111,32 @@ class SelectedCategoryController extends Notifier<NewsCategory> {
     state = category;
     // Best effort: failing to persist a preference must not break navigation.
     ref.read(settingsStoreProvider).writeSelectedCategory(category.apiValue);
+  }
+}
+
+/// Light/dark preference. Defaults to following the system.
+final themeModeProvider = NotifierProvider<ThemeModeController, ThemeMode>(
+  ThemeModeController.new,
+);
+
+class ThemeModeController extends Notifier<ThemeMode> {
+  @override
+  ThemeMode build() => _parse(ref.read(settingsStoreProvider).readThemeMode());
+
+  void set(ThemeMode mode) {
+    if (state == mode) return;
+    state = mode;
+    // Best effort: failing to persist a preference must not break the UI.
+    ref.read(settingsStoreProvider).writeThemeMode(mode.name);
+  }
+
+  /// Unknown or absent values fall back to [ThemeMode.system] rather than
+  /// throwing, so a stale stored value cannot break start-up.
+  static ThemeMode _parse(String? value) {
+    return switch (value) {
+      'light' => ThemeMode.light,
+      'dark' => ThemeMode.dark,
+      _ => ThemeMode.system,
+    };
   }
 }

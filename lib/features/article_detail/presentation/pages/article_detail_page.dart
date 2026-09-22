@@ -2,12 +2,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:news_app/core/theme/app_colors.dart';
+import 'package:news_app/core/theme/newsline_tokens.dart';
+import 'package:news_app/core/utils/relative_time.dart';
+import 'package:news_app/l10n/app_localizations.dart';
 import 'package:news_app/core/widgets/status_views.dart';
 import 'package:news_app/features/article_detail/presentation/controllers/cached_article_provider.dart';
 import 'package:news_app/features/news/domain/entities/article.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
 
 /// Article reader.
@@ -67,9 +68,9 @@ class _Unavailable extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Article')),
-      body: EmptyView(
+      body: StatusView(
         icon: Icons.article_outlined,
-        title: 'Article not loaded',
+        title: AppLocalizations.of(context).comingSoonTitle,
         message: message,
       ),
       floatingActionButton: url == null
@@ -104,42 +105,25 @@ class _Reader extends StatelessWidget {
                   const SizedBox(height: 16),
                   Text(
                     article.title,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                      height: 1.3,
-                    ),
+                    style: Theme.of(context).textTheme.displaySmall,
                   ),
                   if (article.description != null) ...<Widget>[
                     const SizedBox(height: 16),
                     Text(
                       article.description!,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: AppColors.textSecondary,
-                        height: 1.5,
-                      ),
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ],
                   if (article.content != null) ...<Widget>[
                     const SizedBox(height: 20),
-                    const Text(
+                    Text(
                       'Content',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
+                      style: Theme.of(context).textTheme.headlineMedium,
                     ),
                     const SizedBox(height: 8),
                     Text(
                       article.content!,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: AppColors.textPrimary,
-                        height: 1.6,
-                      ),
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ],
                   const SizedBox(height: 24),
@@ -247,26 +231,25 @@ class _SourceLine extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.1),
+            color: NewslineTokens.of(context).tintedSurface,
             borderRadius: BorderRadius.circular(4),
           ),
           child: Text(
             article.source.name,
-            style: const TextStyle(
-              color: AppColors.primary,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: NewslineTokens.of(context).accent,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
         if (publishedAt != null) ...<Widget>[
           const SizedBox(width: 12),
           Text(
-            timeago.format(publishedAt),
-            style: const TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 12,
+            formatRelativeTime(
+              publishedAt,
+              Localizations.localeOf(context).languageCode,
             ),
+            style: Theme.of(context).textTheme.labelSmall,
           ),
         ],
       ],
@@ -282,11 +265,15 @@ class _HeaderPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.divider,
+      color: NewslineTokens.of(context).surfaceSecondary,
       child: Center(
         child: icon == null
             ? const CircularProgressIndicator()
-            : Icon(icon, size: 50, color: AppColors.textHint),
+            : Icon(
+                icon,
+                size: 50,
+                color: NewslineTokens.of(context).textSecondary,
+              ),
       ),
     );
   }

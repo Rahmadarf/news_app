@@ -3,22 +3,40 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:news_app/app/di/providers.dart';
 import 'package:news_app/app/routing/app_routes.dart';
-import 'package:news_app/core/theme/app_colors.dart';
+import 'package:news_app/core/theme/newsline_tokens.dart';
 import 'package:news_app/core/widgets/status_views.dart';
 import 'package:news_app/features/news/domain/entities/article.dart';
 import 'package:news_app/features/news/domain/entities/news_category.dart';
 import 'package:news_app/features/news/presentation/controllers/news_feed_controller.dart';
 import 'package:news_app/features/news/presentation/state/news_feed_state.dart';
-import 'package:news_app/features/news/presentation/widgets/article_list_shimmer.dart';
-import 'package:news_app/features/news/presentation/widgets/article_list_view.dart';
-import 'package:news_app/features/news/presentation/widgets/category_selector.dart';
-import 'package:news_app/features/search/presentation/widgets/search_dialog.dart';
+import 'package:news_app/features/news/presentation/widgets/article_row.dart';
+import 'package:news_app/features/news/presentation/widgets/category_chips.dart';
+import 'package:news_app/features/news/presentation/widgets/featured_article_card.dart';
+import 'package:news_app/features/news/presentation/widgets/home_greeting_header.dart';
+import 'package:news_app/features/news/presentation/widgets/home_skeleton.dart';
+import 'package:news_app/features/news/presentation/widgets/section_header.dart';
+import 'package:news_app/l10n/app_localizations.dart';
+import 'package:news_app/core/utils/relative_time.dart';
 
+/// Home feed.
+///
+/// Two sections drawn from the approved repository:
+///
+/// * **Trending today** always reads the `general` feed, so the rail stays
+///   stable while the chips filter the list below it.
+/// * **Recent stories** reads the feed for the selected category.
+///
+/// When the selected category *is* `general` both sections read the same
+/// provider instance, so nothing is fetched twice.
 class NewsFeedPage extends ConsumerWidget {
   const NewsFeedPage({super.key});
 
+  /// How many articles the trending rail shows.
+  static const int trendingCount = 5;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
     final NewsCategory category = ref.watch(selectedCategoryProvider);
     final NewsFeedState state = ref.watch(newsFeedControllerProvider(category));
     final NewsFeedController controller = ref.read(
@@ -26,115 +44,273 @@ class NewsFeedPage extends ConsumerWidget {
     );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('News App'),
-        centerTitle: true,
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () => _openSearch(context),
-          ),
-        ],
-      ),
-      body: Column(
-        children: <Widget>[
-          CategorySelector(
-            selected: category,
-            onSelected: ref.read(selectedCategoryProvider.notifier).select,
-          ),
-          Expanded(
-            child: switch (state) {
-              NewsFeedLoading() => const ArticleListShimmer(),
-              NewsFeedError(:final failure) => FailureView(
-                failure: failure,
-                onRetry: controller.retry,
-              ),
-              NewsFeedReady(isEmpty: true) => RefreshIndicator(
-                onRefresh: controller.refresh,
-                child: const _ScrollableEmpty(
-                  title: 'No news available',
-                  message: 'Please try again later.',
+      body: SafeArea(
+        bottom: false,
+        child: RefreshIndicator(
+          onRefresh: controller.refresh,
+          child: switch (state) {
+            NewsFeedLoading() => ListView(
+              children: <Widget>[
+                HomeGreetingHeader(
+                  onNotificationsTap: () => _showComingSoon(context),
                 ),
-              ),
-              final NewsFeedReady ready => RefreshIndicator(
-                onRefresh: controller.refresh,
-                child: ArticleListView(
-                  articles: ready.articles,
-                  hasMore: ready.hasMore,
-                  isLoadingMore: ready.isLoadingMore,
-                  pageFailure: ready.pageFailure,
-                  onLoadMore: controller.loadMore,
-                  onArticleTap: (Article article) =>
-                      _openArticle(context, article),
-                  header: ready.isStale ? const _OfflineBanner() : null,
+                const SizedBox(height: Spacing.lg),
+                const HomeSkeleton(),
+              ],
+            ),
+            NewsFeedError(:final failure) => ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: <Widget>[
+                HomeGreetingHeader(
+                  onNotificationsTap: () => _showComingSoon(context),
                 ),
-              ),
-            },
-          ),
-        ],
+                StatusView.failure(
+                  l10n: l10n,
+                  failure: failure,
+                  onRetry: controller.retry,
+                ),
+              ],
+            ),
+            final NewsFeedReady ready => _Feed(
+              category: category,
+              ready: ready,
+              controller: controller,
+            ),
+          },
+        ),
       ),
     );
   }
 
-  Future<void> _openSearch(BuildContext context) async {
-    final String? query = await showSearchDialog(context);
-    if (query == null || !context.mounted) return;
-    context.push(AppRoutes.search(query));
+  static void _showComingSoon(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(SnackBar(content: Text(l10n.comingSoonBody)));
+  }
+}
+
+class _Feed extends ConsumerWidget {
+  const _Feed({
+    required this.category,
+    required this.ready,
+    required this.controller,
+  });
+
+  final NewsCategory category;
+  final NewsFeedReady ready;
+  final NewsFeedController controller;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    final NewslineTokens tokens = NewslineTokens.of(context);
+
+    // The trending rail is always the general feed; when that is also the
+    // selected category this resolves to the very same provider instance.
+    final NewsFeedState trendingState = category == NewsCategory.general
+        ? ready
+        : ref.watch(newsFeedControllerProvider(NewsCategory.general));
+    final List<Article> trending = trendingState is NewsFeedReady
+        ? trendingState.articles.take(NewsFeedPage.trendingCount).toList()
+        : const <Article>[];
+
+    final List<Article> recent = ready.articles;
+
+    return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      slivers: <Widget>[
+        SliverToBoxAdapter(
+          child: HomeGreetingHeader(
+            onNotificationsTap: () => NewsFeedPage._showComingSoon(context),
+          ),
+        ),
+        if (ready.isStale)
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: Spacing.gutter),
+            sliver: SliverToBoxAdapter(
+              child: OfflineBanner(
+                updatedLabel: _updatedLabel(context, l10n, ready.fetchedAt),
+              ),
+            ),
+          ),
+        if (trending.isNotEmpty) ...<Widget>[
+          SliverToBoxAdapter(
+            child: SectionHeader(
+              title: l10n.trendingTodayTitle,
+              trailing: TextButton(
+                onPressed: () => context.push(AppRoutes.searchPath),
+                child: Text('${l10n.seeAllAction} ↗'),
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(child: _TrendingRail(articles: trending)),
+        ],
+        SliverToBoxAdapter(
+          child: SectionHeader(
+            title: l10n.recentStoriesTitle,
+            trailing: IconButton(
+              onPressed: () => context.push(AppRoutes.searchPath),
+              tooltip: l10n.searchLabel,
+              icon: const Icon(Icons.search),
+            ),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: CategoryChips(
+            selected: category,
+            onSelected: ref.read(selectedCategoryProvider.notifier).select,
+          ),
+        ),
+        const SliverToBoxAdapter(child: SizedBox(height: Spacing.sm)),
+        if (recent.isEmpty)
+          SliverToBoxAdapter(
+            child: StatusView(
+              icon: Icons.newspaper_outlined,
+              title: l10n.emptyFeedTitle,
+              message: l10n.emptyFeedBody,
+              actionLabel: l10n.retryAction,
+              onAction: controller.refresh,
+            ),
+          )
+        else
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: Spacing.gutter),
+            sliver: SliverList.builder(
+              itemCount: recent.length,
+              itemBuilder: (BuildContext context, int index) {
+                final Article article = recent[index];
+                return ArticleRow(
+                  article: article,
+                  eyebrow: categoryLabel(l10n, category),
+                  showDivider: index != recent.length - 1,
+                  onTap: () => _openArticle(context, article),
+                );
+              },
+            ),
+          ),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              Spacing.gutter,
+              Spacing.lg,
+              Spacing.gutter,
+              0,
+            ),
+            child: _FeedFooter(ready: ready, controller: controller),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: Spacing.xl),
+            child: Text(
+              l10n.homeFooterTagline,
+              textAlign: TextAlign.center,
+              style: Theme.of(
+                context,
+              ).textTheme.labelSmall?.copyWith(color: tokens.textSecondary),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   void _openArticle(BuildContext context, Article article) {
     context.push(AppRoutes.article(article.url), extra: article);
   }
+
+  static String? _updatedLabel(
+    BuildContext context,
+    AppLocalizations l10n,
+    DateTime? fetchedAt,
+  ) {
+    if (fetchedAt == null) return null;
+    final String locale = Localizations.localeOf(context).languageCode;
+    return l10n.lastUpdatedLabel(formatRelativeTime(fetchedAt, locale));
+  }
 }
 
-/// Empty state that still scrolls, so pull-to-refresh keeps working.
-class _ScrollableEmpty extends StatelessWidget {
-  const _ScrollableEmpty({required this.title, required this.message});
+class _TrendingRail extends StatelessWidget {
+  const _TrendingRail({required this.articles});
 
-  final String title;
-  final String message;
+  final List<Article> articles;
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        return SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: EmptyView(title: title, message: message),
-          ),
-        );
-      },
+    // Height is intrinsic so the rail grows with the text scale instead of
+    // clipping the serif titles.
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: Spacing.gutter),
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            for (final Article article in articles) ...<Widget>[
+              FeaturedArticleCard(
+                article: article,
+                onTap: () => context.push(
+                  AppRoutes.article(article.url),
+                  extra: article,
+                ),
+              ),
+              if (article != articles.last)
+                const SizedBox(width: Spacing.featuredGap),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }
 
-class _OfflineBanner extends StatelessWidget {
-  const _OfflineBanner();
+/// Load-more control, page-failure notice, or end-of-feed spacing.
+class _FeedFooter extends StatelessWidget {
+  const _FeedFooter({required this.ready, required this.controller});
+
+  final NewsFeedReady ready;
+  final NewsFeedController controller;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: const Row(
+    final AppLocalizations l10n = AppLocalizations.of(context);
+
+    if (ready.pageFailure != null) {
+      return Column(
         children: <Widget>[
-          Icon(Icons.cloud_off, size: 18, color: AppColors.primary),
-          SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'Showing saved articles. Pull to refresh when you are back '
-              'online.',
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
-            ),
+          Text(
+            describeFailure(l10n, ready.pageFailure!).title,
+            style: Theme.of(context).textTheme.labelSmall,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: Spacing.sm),
+          OutlinedButton(
+            onPressed: controller.loadMore,
+            child: Text(l10n.retryAction),
           ),
         ],
-      ),
+      );
+    }
+
+    if (ready.isLoadingMore) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(Spacing.md),
+          child: SizedBox(
+            width: 22,
+            height: 22,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ),
+      );
+    }
+
+    if (!ready.hasMore) return const SizedBox.shrink();
+
+    return OutlinedButton(
+      onPressed: controller.loadMore,
+      child: Text(l10n.loadMoreAction),
     );
   }
 }
