@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:news_app/core/errors/failure.dart';
-import 'package:news_app/core/theme/app_colors.dart';
+import 'package:news_app/core/theme/newsline_tokens.dart';
 import 'package:news_app/core/widgets/status_views.dart';
 import 'package:news_app/features/news/domain/entities/article.dart';
-import 'package:news_app/features/news/presentation/widgets/article_card.dart';
+import 'package:news_app/features/news/presentation/widgets/article_row.dart';
+import 'package:news_app/l10n/app_localizations.dart';
 
-/// Paginated article list shared by the feed and the search results screen.
+/// Paginated article list shared by the search results screen and any other
+/// flat list of stories.
 ///
 /// Requests the next page when the user nears the end, and renders a trailing
 /// footer for the paginating and page-failure conditions so the existing list
@@ -29,7 +31,7 @@ class ArticleListView extends StatefulWidget {
   final bool hasMore;
   final Failure? pageFailure;
 
-  /// Optional banner pinned above the first card, e.g. the offline notice.
+  /// Optional banner pinned above the first row, e.g. the offline notice.
   final Widget? header;
 
   @override
@@ -74,7 +76,8 @@ class _ArticleListViewState extends State<ArticleListView> {
 
     return ListView.builder(
       controller: _controller,
-      padding: const EdgeInsets.all(16),
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: Spacing.gutter),
       itemCount: widget.articles.length + headerCount + footerCount,
       itemBuilder: (BuildContext context, int index) {
         if (hasHeader && index == 0) return widget.header!;
@@ -82,8 +85,9 @@ class _ArticleListViewState extends State<ArticleListView> {
         final int articleIndex = index - headerCount;
         if (articleIndex < widget.articles.length) {
           final Article article = widget.articles[articleIndex];
-          return ArticleCard(
+          return ArticleRow(
             article: article,
+            showDivider: articleIndex != widget.articles.length - 1,
             onTap: () => widget.onArticleTap(article),
           );
         }
@@ -111,23 +115,22 @@ class _Footer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
     final Failure? failure = pageFailure;
 
     if (failure != null) {
       return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: const EdgeInsets.symmetric(vertical: Spacing.lg),
         child: Column(
           children: <Widget>[
             Text(
-              describeFailure(failure).title,
-              style: const TextStyle(color: AppColors.textSecondary),
+              describeFailure(l10n, failure).title,
+              style: Theme.of(context).textTheme.labelSmall,
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: Spacing.sm),
             if (onRetry != null)
-              OutlinedButton(
-                onPressed: onRetry,
-                child: const Text('Try again'),
-              ),
+              OutlinedButton(onPressed: onRetry, child: Text(l10n.retryAction)),
           ],
         ),
       );
@@ -135,11 +138,17 @@ class _Footer extends StatelessWidget {
 
     if (isLoadingMore) {
       return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 24),
-        child: Center(child: CircularProgressIndicator()),
+        padding: EdgeInsets.symmetric(vertical: Spacing.xl),
+        child: Center(
+          child: SizedBox(
+            width: 22,
+            height: 22,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ),
       );
     }
 
-    return const SizedBox(height: 24);
+    return const SizedBox(height: Spacing.xl);
   }
 }

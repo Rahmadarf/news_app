@@ -1,3 +1,5 @@
+import 'package:news_app/features/news/domain/entities/news_category.dart';
+
 /// Route paths and names, in one place.
 ///
 /// Query parameters are part of the contract: they make every destination
@@ -7,26 +9,40 @@ abstract final class AppRoutes {
   static const String feedName = 'feed';
   static const String feedPath = '/';
 
-  static const String searchName = 'search';
-  static const String searchPath = '/search';
+  static const String discoverName = 'discover';
+  static const String discoverPath = '/discover';
+
+  static const String bookmarksName = 'bookmarks';
+  static const String bookmarksPath = '/bookmarks';
+
+  static const String settingsName = 'settings';
+  static const String settingsPath = '/settings';
+
+  static const String historyName = 'history';
+  static const String historyPath = '/history';
 
   /// Carries the canonical article URL in `?url=`.
   static const String articleName = 'article';
   static const String articlePath = '/article';
 
-  /// Query parameter holding the search term.
   static const String queryParam = 'q';
-
-  /// Query parameter holding the canonical article URL.
   static const String urlParam = 'url';
 
-  static String search(String query) => Uri(
-    path: searchPath,
+  /// Category the article was opened from, so the eyebrow and related stories
+  /// survive a shared link.
+  static const String categoryParam = 'cat';
+
+  /// Discover with a pre-filled term, for deep links.
+  static String discoverWithQuery(String query) => Uri(
+    path: discoverPath,
     queryParameters: <String, String>{queryParam: query},
   ).toString();
 
-  static String article(String articleUrl) => Uri(
+  static String article(String articleUrl, {NewsCategory? category}) => Uri(
     path: articlePath,
-    queryParameters: <String, String>{urlParam: articleUrl},
+    queryParameters: <String, String>{
+      urlParam: articleUrl,
+      categoryParam: ?category?.apiValue,
+    },
   ).toString();
 }

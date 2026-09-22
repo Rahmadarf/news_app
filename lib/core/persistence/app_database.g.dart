@@ -1228,6 +1228,218 @@ class FeedPageMetadataCompanion extends UpdateCompanion<FeedPageMetadataData> {
   }
 }
 
+class $CollectionsTable extends Collections
+    with TableInfo<$CollectionsTable, Collection> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CollectionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [name, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'collections';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Collection> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {name};
+  @override
+  Collection map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Collection(
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $CollectionsTable createAlias(String alias) {
+    return $CollectionsTable(attachedDatabase, alias);
+  }
+}
+
+class Collection extends DataClass implements Insertable<Collection> {
+  final String name;
+  final DateTime createdAt;
+  const Collection({required this.name, required this.createdAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['name'] = Variable<String>(name);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  CollectionsCompanion toCompanion(bool nullToAbsent) {
+    return CollectionsCompanion(name: Value(name), createdAt: Value(createdAt));
+  }
+
+  factory Collection.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Collection(
+      name: serializer.fromJson<String>(json['name']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'name': serializer.toJson<String>(name),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  Collection copyWith({String? name, DateTime? createdAt}) => Collection(
+    name: name ?? this.name,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  Collection copyWithCompanion(CollectionsCompanion data) {
+    return Collection(
+      name: data.name.present ? data.name.value : this.name,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Collection(')
+          ..write('name: $name, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(name, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Collection &&
+          other.name == this.name &&
+          other.createdAt == this.createdAt);
+}
+
+class CollectionsCompanion extends UpdateCompanion<Collection> {
+  final Value<String> name;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const CollectionsCompanion({
+    this.name = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CollectionsCompanion.insert({
+    required String name,
+    required DateTime createdAt,
+    this.rowid = const Value.absent(),
+  }) : name = Value(name),
+       createdAt = Value(createdAt);
+  static Insertable<Collection> custom({
+    Expression<String>? name,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (name != null) 'name': name,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CollectionsCompanion copyWith({
+    Value<String>? name,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return CollectionsCompanion(
+      name: name ?? this.name,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CollectionsCompanion(')
+          ..write('name: $name, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $BookmarksTable extends Bookmarks
     with TableInfo<$BookmarksTable, Bookmark> {
   @override
@@ -1259,8 +1471,22 @@ class $BookmarksTable extends Bookmarks
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _collectionNameMeta = const VerificationMeta(
+    'collectionName',
+  );
   @override
-  List<GeneratedColumn> get $columns => [articleUrl, createdAt];
+  late final GeneratedColumn<String> collectionName = GeneratedColumn<String>(
+    'collection_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES collections (name) ON DELETE SET NULL',
+    ),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [articleUrl, createdAt, collectionName];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1289,6 +1515,15 @@ class $BookmarksTable extends Bookmarks
     } else if (isInserting) {
       context.missing(_createdAtMeta);
     }
+    if (data.containsKey('collection_name')) {
+      context.handle(
+        _collectionNameMeta,
+        collectionName.isAcceptableOrUnknown(
+          data['collection_name']!,
+          _collectionNameMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -1306,6 +1541,10 @@ class $BookmarksTable extends Bookmarks
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
       )!,
+      collectionName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}collection_name'],
+      ),
     );
   }
 
@@ -1318,12 +1557,23 @@ class $BookmarksTable extends Bookmarks
 class Bookmark extends DataClass implements Insertable<Bookmark> {
   final String articleUrl;
   final DateTime createdAt;
-  const Bookmark({required this.articleUrl, required this.createdAt});
+
+  /// `null` means saved but not filed. Deleting a collection sets this back to
+  /// null rather than removing the bookmark.
+  final String? collectionName;
+  const Bookmark({
+    required this.articleUrl,
+    required this.createdAt,
+    this.collectionName,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['article_url'] = Variable<String>(articleUrl);
     map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || collectionName != null) {
+      map['collection_name'] = Variable<String>(collectionName);
+    }
     return map;
   }
 
@@ -1331,6 +1581,9 @@ class Bookmark extends DataClass implements Insertable<Bookmark> {
     return BookmarksCompanion(
       articleUrl: Value(articleUrl),
       createdAt: Value(createdAt),
+      collectionName: collectionName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(collectionName),
     );
   }
 
@@ -1342,6 +1595,7 @@ class Bookmark extends DataClass implements Insertable<Bookmark> {
     return Bookmark(
       articleUrl: serializer.fromJson<String>(json['articleUrl']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      collectionName: serializer.fromJson<String?>(json['collectionName']),
     );
   }
   @override
@@ -1350,12 +1604,20 @@ class Bookmark extends DataClass implements Insertable<Bookmark> {
     return <String, dynamic>{
       'articleUrl': serializer.toJson<String>(articleUrl),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'collectionName': serializer.toJson<String?>(collectionName),
     };
   }
 
-  Bookmark copyWith({String? articleUrl, DateTime? createdAt}) => Bookmark(
+  Bookmark copyWith({
+    String? articleUrl,
+    DateTime? createdAt,
+    Value<String?> collectionName = const Value.absent(),
+  }) => Bookmark(
     articleUrl: articleUrl ?? this.articleUrl,
     createdAt: createdAt ?? this.createdAt,
+    collectionName: collectionName.present
+        ? collectionName.value
+        : this.collectionName,
   );
   Bookmark copyWithCompanion(BookmarksCompanion data) {
     return Bookmark(
@@ -1363,6 +1625,9 @@ class Bookmark extends DataClass implements Insertable<Bookmark> {
           ? data.articleUrl.value
           : this.articleUrl,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      collectionName: data.collectionName.present
+          ? data.collectionName.value
+          : this.collectionName,
     );
   }
 
@@ -1370,44 +1635,51 @@ class Bookmark extends DataClass implements Insertable<Bookmark> {
   String toString() {
     return (StringBuffer('Bookmark(')
           ..write('articleUrl: $articleUrl, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('collectionName: $collectionName')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(articleUrl, createdAt);
+  int get hashCode => Object.hash(articleUrl, createdAt, collectionName);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Bookmark &&
           other.articleUrl == this.articleUrl &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.collectionName == this.collectionName);
 }
 
 class BookmarksCompanion extends UpdateCompanion<Bookmark> {
   final Value<String> articleUrl;
   final Value<DateTime> createdAt;
+  final Value<String?> collectionName;
   final Value<int> rowid;
   const BookmarksCompanion({
     this.articleUrl = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.collectionName = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   BookmarksCompanion.insert({
     required String articleUrl,
     required DateTime createdAt,
+    this.collectionName = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : articleUrl = Value(articleUrl),
        createdAt = Value(createdAt);
   static Insertable<Bookmark> custom({
     Expression<String>? articleUrl,
     Expression<DateTime>? createdAt,
+    Expression<String>? collectionName,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (articleUrl != null) 'article_url': articleUrl,
       if (createdAt != null) 'created_at': createdAt,
+      if (collectionName != null) 'collection_name': collectionName,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1415,11 +1687,13 @@ class BookmarksCompanion extends UpdateCompanion<Bookmark> {
   BookmarksCompanion copyWith({
     Value<String>? articleUrl,
     Value<DateTime>? createdAt,
+    Value<String?>? collectionName,
     Value<int>? rowid,
   }) {
     return BookmarksCompanion(
       articleUrl: articleUrl ?? this.articleUrl,
       createdAt: createdAt ?? this.createdAt,
+      collectionName: collectionName ?? this.collectionName,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1433,6 +1707,9 @@ class BookmarksCompanion extends UpdateCompanion<Bookmark> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (collectionName.present) {
+      map['collection_name'] = Variable<String>(collectionName.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1444,6 +1721,7 @@ class BookmarksCompanion extends UpdateCompanion<Bookmark> {
     return (StringBuffer('BookmarksCompanion(')
           ..write('articleUrl: $articleUrl, ')
           ..write('createdAt: $createdAt, ')
+          ..write('collectionName: $collectionName, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1676,7 +1954,7 @@ class ReadingHistoryEntriesCompanion
 }
 
 class $RecentSearchesTable extends RecentSearches
-    with TableInfo<$RecentSearchesTable, RecentSearche> {
+    with TableInfo<$RecentSearchesTable, RecentSearchEntry> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -1710,7 +1988,7 @@ class $RecentSearchesTable extends RecentSearches
   static const String $name = 'recent_searches';
   @override
   VerificationContext validateIntegrity(
-    Insertable<RecentSearche> instance, {
+    Insertable<RecentSearchEntry> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -1737,9 +2015,9 @@ class $RecentSearchesTable extends RecentSearches
   @override
   Set<GeneratedColumn> get $primaryKey => {query};
   @override
-  RecentSearche map(Map<String, dynamic> data, {String? tablePrefix}) {
+  RecentSearchEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return RecentSearche(
+    return RecentSearchEntry(
       query: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}query'],
@@ -1757,10 +2035,11 @@ class $RecentSearchesTable extends RecentSearches
   }
 }
 
-class RecentSearche extends DataClass implements Insertable<RecentSearche> {
+class RecentSearchEntry extends DataClass
+    implements Insertable<RecentSearchEntry> {
   final String query;
   final DateTime searchedAt;
-  const RecentSearche({required this.query, required this.searchedAt});
+  const RecentSearchEntry({required this.query, required this.searchedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1776,12 +2055,12 @@ class RecentSearche extends DataClass implements Insertable<RecentSearche> {
     );
   }
 
-  factory RecentSearche.fromJson(
+  factory RecentSearchEntry.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return RecentSearche(
+    return RecentSearchEntry(
       query: serializer.fromJson<String>(json['query']),
       searchedAt: serializer.fromJson<DateTime>(json['searchedAt']),
     );
@@ -1795,13 +2074,13 @@ class RecentSearche extends DataClass implements Insertable<RecentSearche> {
     };
   }
 
-  RecentSearche copyWith({String? query, DateTime? searchedAt}) =>
-      RecentSearche(
+  RecentSearchEntry copyWith({String? query, DateTime? searchedAt}) =>
+      RecentSearchEntry(
         query: query ?? this.query,
         searchedAt: searchedAt ?? this.searchedAt,
       );
-  RecentSearche copyWithCompanion(RecentSearchesCompanion data) {
-    return RecentSearche(
+  RecentSearchEntry copyWithCompanion(RecentSearchesCompanion data) {
+    return RecentSearchEntry(
       query: data.query.present ? data.query.value : this.query,
       searchedAt: data.searchedAt.present
           ? data.searchedAt.value
@@ -1811,7 +2090,7 @@ class RecentSearche extends DataClass implements Insertable<RecentSearche> {
 
   @override
   String toString() {
-    return (StringBuffer('RecentSearche(')
+    return (StringBuffer('RecentSearchEntry(')
           ..write('query: $query, ')
           ..write('searchedAt: $searchedAt')
           ..write(')'))
@@ -1823,12 +2102,12 @@ class RecentSearche extends DataClass implements Insertable<RecentSearche> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is RecentSearche &&
+      (other is RecentSearchEntry &&
           other.query == this.query &&
           other.searchedAt == this.searchedAt);
 }
 
-class RecentSearchesCompanion extends UpdateCompanion<RecentSearche> {
+class RecentSearchesCompanion extends UpdateCompanion<RecentSearchEntry> {
   final Value<String> query;
   final Value<DateTime> searchedAt;
   final Value<int> rowid;
@@ -1843,7 +2122,7 @@ class RecentSearchesCompanion extends UpdateCompanion<RecentSearche> {
     this.rowid = const Value.absent(),
   }) : query = Value(query),
        searchedAt = Value(searchedAt);
-  static Insertable<RecentSearche> custom({
+  static Insertable<RecentSearchEntry> custom({
     Expression<String>? query,
     Expression<DateTime>? searchedAt,
     Expression<int>? rowid,
@@ -1901,6 +2180,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $FeedPageMetadataTable feedPageMetadata = $FeedPageMetadataTable(
     this,
   );
+  late final $CollectionsTable collections = $CollectionsTable(this);
   late final $BookmarksTable bookmarks = $BookmarksTable(this);
   late final $ReadingHistoryEntriesTable readingHistoryEntries =
       $ReadingHistoryEntriesTable(this);
@@ -1913,6 +2193,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     cachedArticles,
     feedEntries,
     feedPageMetadata,
+    collections,
     bookmarks,
     readingHistoryEntries,
     recentSearches,
@@ -1932,6 +2213,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('bookmarks', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'collections',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('bookmarks', kind: UpdateKind.update)],
     ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
@@ -3041,16 +3329,263 @@ typedef $$FeedPageMetadataTableProcessedTableManager =
       FeedPageMetadataData,
       PrefetchHooks Function()
     >;
+typedef $$CollectionsTableCreateCompanionBuilder =
+    CollectionsCompanion Function({
+      required String name,
+      required DateTime createdAt,
+      Value<int> rowid,
+    });
+typedef $$CollectionsTableUpdateCompanionBuilder =
+    CollectionsCompanion Function({
+      Value<String> name,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+
+final class $$CollectionsTableReferences
+    extends BaseReferences<_$AppDatabase, $CollectionsTable, Collection> {
+  $$CollectionsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$BookmarksTable, List<Bookmark>>
+  _bookmarksRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.bookmarks,
+    aliasName: 'collections__name__bookmarks__collection_name',
+  );
+
+  $$BookmarksTableProcessedTableManager get bookmarksRefs {
+    final manager = $$BookmarksTableTableManager($_db, $_db.bookmarks).filter(
+      (f) => f.collectionName.name.sqlEquals($_itemColumn<String>('name')!),
+    );
+
+    final cache = $_typedResult.readTableOrNull(_bookmarksRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$CollectionsTableFilterComposer
+    extends Composer<_$AppDatabase, $CollectionsTable> {
+  $$CollectionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> bookmarksRefs(
+    Expression<bool> Function($$BookmarksTableFilterComposer f) f,
+  ) {
+    final $$BookmarksTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.name,
+      referencedTable: $db.bookmarks,
+      getReferencedColumn: (t) => t.collectionName,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BookmarksTableFilterComposer(
+            $db: $db,
+            $table: $db.bookmarks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$CollectionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CollectionsTable> {
+  $$CollectionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CollectionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CollectionsTable> {
+  $$CollectionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  Expression<T> bookmarksRefs<T extends Object>(
+    Expression<T> Function($$BookmarksTableAnnotationComposer a) f,
+  ) {
+    final $$BookmarksTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.name,
+      referencedTable: $db.bookmarks,
+      getReferencedColumn: (t) => t.collectionName,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BookmarksTableAnnotationComposer(
+            $db: $db,
+            $table: $db.bookmarks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$CollectionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CollectionsTable,
+          Collection,
+          $$CollectionsTableFilterComposer,
+          $$CollectionsTableOrderingComposer,
+          $$CollectionsTableAnnotationComposer,
+          $$CollectionsTableCreateCompanionBuilder,
+          $$CollectionsTableUpdateCompanionBuilder,
+          (Collection, $$CollectionsTableReferences),
+          Collection,
+          PrefetchHooks Function({bool bookmarksRefs})
+        > {
+  $$CollectionsTableTableManager(_$AppDatabase db, $CollectionsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CollectionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CollectionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CollectionsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> name = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CollectionsCompanion(
+                name: name,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String name,
+                required DateTime createdAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CollectionsCompanion.insert(
+                name: name,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CollectionsTable, Collection>(table),
+                  $$CollectionsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({bookmarksRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (bookmarksRefs) db.bookmarks],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (bookmarksRefs)
+                    await $_getPrefetchedData<
+                      Collection,
+                      $CollectionsTable,
+                      Bookmark
+                    >(
+                      currentTable: table,
+                      referencedTable: $$CollectionsTableReferences
+                          ._bookmarksRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$CollectionsTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).bookmarksRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where(
+                            (e) => e.collectionName == item.name,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$CollectionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CollectionsTable,
+      Collection,
+      $$CollectionsTableFilterComposer,
+      $$CollectionsTableOrderingComposer,
+      $$CollectionsTableAnnotationComposer,
+      $$CollectionsTableCreateCompanionBuilder,
+      $$CollectionsTableUpdateCompanionBuilder,
+      (Collection, $$CollectionsTableReferences),
+      Collection,
+      PrefetchHooks Function({bool bookmarksRefs})
+    >;
 typedef $$BookmarksTableCreateCompanionBuilder =
     BookmarksCompanion Function({
       required String articleUrl,
       required DateTime createdAt,
+      Value<String?> collectionName,
       Value<int> rowid,
     });
 typedef $$BookmarksTableUpdateCompanionBuilder =
     BookmarksCompanion Function({
       Value<String> articleUrl,
       Value<DateTime> createdAt,
+      Value<String?> collectionName,
       Value<int> rowid,
     });
 
@@ -3070,6 +3605,24 @@ final class $$BookmarksTableReferences
       $_db.cachedArticles,
     ).filter((f) => f.url.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_articleUrlTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $CollectionsTable _collectionNameTable(_$AppDatabase db) => db
+      .collections
+      .createAlias('bookmarks__collection_name__collections__name');
+
+  $$CollectionsTableProcessedTableManager? get collectionName {
+    final $_column = $_itemColumn<String>('collection_name');
+    if ($_column == null) return null;
+    final manager = $$CollectionsTableTableManager(
+      $_db,
+      $_db.collections,
+    ).filter((f) => f.name.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_collectionNameTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
@@ -3105,6 +3658,29 @@ class $$BookmarksTableFilterComposer
           }) => $$CachedArticlesTableFilterComposer(
             $db: $db,
             $table: $db.cachedArticles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CollectionsTableFilterComposer get collectionName {
+    final $$CollectionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.collectionName,
+      referencedTable: $db.collections,
+      getReferencedColumn: (t) => t.name,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CollectionsTableFilterComposer(
+            $db: $db,
+            $table: $db.collections,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -3151,6 +3727,29 @@ class $$BookmarksTableOrderingComposer
     );
     return composer;
   }
+
+  $$CollectionsTableOrderingComposer get collectionName {
+    final $$CollectionsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.collectionName,
+      referencedTable: $db.collections,
+      getReferencedColumn: (t) => t.name,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CollectionsTableOrderingComposer(
+            $db: $db,
+            $table: $db.collections,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$BookmarksTableAnnotationComposer
@@ -3187,6 +3786,29 @@ class $$BookmarksTableAnnotationComposer
     );
     return composer;
   }
+
+  $$CollectionsTableAnnotationComposer get collectionName {
+    final $$CollectionsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.collectionName,
+      referencedTable: $db.collections,
+      getReferencedColumn: (t) => t.name,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CollectionsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.collections,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$BookmarksTableTableManager
@@ -3202,7 +3824,7 @@ class $$BookmarksTableTableManager
           $$BookmarksTableUpdateCompanionBuilder,
           (Bookmark, $$BookmarksTableReferences),
           Bookmark,
-          PrefetchHooks Function({bool articleUrl})
+          PrefetchHooks Function({bool articleUrl, bool collectionName})
         > {
   $$BookmarksTableTableManager(_$AppDatabase db, $BookmarksTable table)
     : super(
@@ -3219,20 +3841,24 @@ class $$BookmarksTableTableManager
               ({
                 Value<String> articleUrl = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<String?> collectionName = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => BookmarksCompanion(
                 articleUrl: articleUrl,
                 createdAt: createdAt,
+                collectionName: collectionName,
                 rowid: rowid,
               ),
           createCompanionCallback:
               ({
                 required String articleUrl,
                 required DateTime createdAt,
+                Value<String?> collectionName = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => BookmarksCompanion.insert(
                 articleUrl: articleUrl,
                 createdAt: createdAt,
+                collectionName: collectionName,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -3243,47 +3869,61 @@ class $$BookmarksTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({articleUrl = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (articleUrl) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.articleUrl,
-                                referencedTable: $$BookmarksTableReferences
-                                    ._articleUrlTable(db),
-                                referencedColumn: $$BookmarksTableReferences
-                                    ._articleUrlTable(db)
-                                    .url,
-                              )
-                              as T;
-                    }
+          prefetchHooksCallback:
+              ({articleUrl = false, collectionName = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (articleUrl) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.articleUrl,
+                                    referencedTable: $$BookmarksTableReferences
+                                        ._articleUrlTable(db),
+                                    referencedColumn: $$BookmarksTableReferences
+                                        ._articleUrlTable(db)
+                                        .url,
+                                  )
+                                  as T;
+                        }
+                        if (collectionName) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.collectionName,
+                                    referencedTable: $$BookmarksTableReferences
+                                        ._collectionNameTable(db),
+                                    referencedColumn: $$BookmarksTableReferences
+                                        ._collectionNameTable(db)
+                                        .name,
+                                  )
+                                  as T;
+                        }
 
-                    return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
                   },
-              getPrefetchedDataCallback: (items) async {
-                return [];
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -3300,7 +3940,7 @@ typedef $$BookmarksTableProcessedTableManager =
       $$BookmarksTableUpdateCompanionBuilder,
       (Bookmark, $$BookmarksTableReferences),
       Bookmark,
-      PrefetchHooks Function({bool articleUrl})
+      PrefetchHooks Function({bool articleUrl, bool collectionName})
     >;
 typedef $$ReadingHistoryEntriesTableCreateCompanionBuilder =
     ReadingHistoryEntriesCompanion Function({
@@ -3664,17 +4304,21 @@ class $$RecentSearchesTableTableManager
         RootTableManager<
           _$AppDatabase,
           $RecentSearchesTable,
-          RecentSearche,
+          RecentSearchEntry,
           $$RecentSearchesTableFilterComposer,
           $$RecentSearchesTableOrderingComposer,
           $$RecentSearchesTableAnnotationComposer,
           $$RecentSearchesTableCreateCompanionBuilder,
           $$RecentSearchesTableUpdateCompanionBuilder,
           (
-            RecentSearche,
-            BaseReferences<_$AppDatabase, $RecentSearchesTable, RecentSearche>,
+            RecentSearchEntry,
+            BaseReferences<
+              _$AppDatabase,
+              $RecentSearchesTable,
+              RecentSearchEntry
+            >,
           ),
-          RecentSearche,
+          RecentSearchEntry,
           PrefetchHooks Function()
         > {
   $$RecentSearchesTableTableManager(
@@ -3713,11 +4357,11 @@ class $$RecentSearchesTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$RecentSearchesTable, RecentSearche>(table),
+                  e.readTable<$RecentSearchesTable, RecentSearchEntry>(table),
                   BaseReferences<
                     _$AppDatabase,
                     $RecentSearchesTable,
-                    RecentSearche
+                    RecentSearchEntry
                   >(db, table, e),
                 ),
               )
@@ -3731,17 +4375,17 @@ typedef $$RecentSearchesTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $RecentSearchesTable,
-      RecentSearche,
+      RecentSearchEntry,
       $$RecentSearchesTableFilterComposer,
       $$RecentSearchesTableOrderingComposer,
       $$RecentSearchesTableAnnotationComposer,
       $$RecentSearchesTableCreateCompanionBuilder,
       $$RecentSearchesTableUpdateCompanionBuilder,
       (
-        RecentSearche,
-        BaseReferences<_$AppDatabase, $RecentSearchesTable, RecentSearche>,
+        RecentSearchEntry,
+        BaseReferences<_$AppDatabase, $RecentSearchesTable, RecentSearchEntry>,
       ),
-      RecentSearche,
+      RecentSearchEntry,
       PrefetchHooks Function()
     >;
 
@@ -3754,6 +4398,8 @@ class $AppDatabaseManager {
       $$FeedEntriesTableTableManager(_db, _db.feedEntries);
   $$FeedPageMetadataTableTableManager get feedPageMetadata =>
       $$FeedPageMetadataTableTableManager(_db, _db.feedPageMetadata);
+  $$CollectionsTableTableManager get collections =>
+      $$CollectionsTableTableManager(_db, _db.collections);
   $$BookmarksTableTableManager get bookmarks =>
       $$BookmarksTableTableManager(_db, _db.bookmarks);
   $$ReadingHistoryEntriesTableTableManager get readingHistoryEntries =>

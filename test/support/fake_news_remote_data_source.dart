@@ -36,7 +36,9 @@ class FakeNewsRemoteDataSource implements NewsRemoteDataSource {
   int headlineCallCount = 0;
   int searchCallCount = 0;
   String? lastCategory;
+  String? lastCountry;
   String? lastQuery;
+  String? lastSortBy;
   int? lastPage;
 
   @override
@@ -48,6 +50,7 @@ class FakeNewsRemoteDataSource implements NewsRemoteDataSource {
   }) async {
     headlineCallCount++;
     lastCategory = category;
+    lastCountry = country;
     lastPage = page;
     return _respond(page);
   }
@@ -57,10 +60,12 @@ class FakeNewsRemoteDataSource implements NewsRemoteDataSource {
     required String query,
     required int page,
     required int pageSize,
+    String? sortBy,
   }) async {
     searchCallCount++;
     lastQuery = query;
     lastPage = page;
+    lastSortBy = sortBy;
     return _respond(page);
   }
 

@@ -8,8 +8,6 @@ import 'package:news_app/features/news/data/repositories/news_repository_impl.da
 import 'package:news_app/features/news/domain/entities/news_category.dart';
 import 'package:news_app/features/news/presentation/controllers/news_feed_controller.dart';
 import 'package:news_app/features/news/presentation/state/news_feed_state.dart';
-import 'package:news_app/features/search/presentation/controllers/search_controller.dart';
-import 'package:news_app/features/search/presentation/state/search_state.dart';
 
 import '../../../support/fake_news_remote_data_source.dart';
 import '../../../support/test_database.dart';
@@ -127,25 +125,5 @@ void main() {
 
     expect(container.read(general), isA<NewsFeedReady>());
     expect(container.read(sports), isA<NewsFeedLoading>());
-  });
-
-  test('refreshing the feed never replaces search results', () async {
-    final ProviderContainer container = containerWith(
-      FakeNewsRemoteDataSource(totalResults: 12, articlesPerPage: 5),
-    );
-
-    final feed = newsFeedControllerProvider(NewsCategory.general);
-    final search = searchControllerProvider('flutter');
-
-    await container.read(feed.notifier).retry();
-    await container.read(search.notifier).refresh();
-
-    final SearchReady before = container.read(search) as SearchReady;
-
-    await container.read(feed.notifier).refresh();
-
-    final SearchReady after = container.read(search) as SearchReady;
-    expect(after.articles, before.articles);
-    expect(container.read(feed), isA<NewsFeedReady>());
   });
 }

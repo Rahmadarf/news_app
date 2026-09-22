@@ -16,5 +16,6 @@ abstract interface class NewsRemoteDataSource {
     required String query,
     required int page,
     required int pageSize,
+    String? sortBy,
   });
 }

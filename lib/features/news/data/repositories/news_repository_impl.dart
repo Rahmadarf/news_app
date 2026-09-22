@@ -13,12 +13,21 @@ import 'package:news_app/features/news/domain/entities/article.dart';
 import 'package:news_app/features/news/domain/entities/article_feed.dart';
 import 'package:news_app/features/news/domain/entities/news_category.dart';
 import 'package:news_app/features/news/domain/repositories/news_repository.dart';
+import 'package:news_app/features/search/domain/entities/search_sort.dart';
 
 /// Default page size for every paginated request.
 const int kNewsPageSize = 20;
 
 /// How long a cached headline page is considered fresh.
 const Duration kFeedCacheTtl = Duration(minutes: 15);
+
+/// How many results NewsAPI will serve for one query before it refuses.
+///
+/// On the Developer plan, asking past the hundredth result returns HTTP 426
+/// `maximumResultsReached` — `totalResults` still reports the full match count,
+/// so believing it would make the UI offer a page that is guaranteed to fail.
+/// A paid plan raises this; it is a constructor parameter for that reason.
+const int kNewsMaxResultWindow = 100;
 
 /// Repository over one explicitly supplied remote source plus the local cache.
 ///
@@ -45,12 +54,14 @@ class NewsRepositoryImpl implements NewsRepository {
     String country = defaultCountry,
     int pageSize = kNewsPageSize,
     Duration ttl = kFeedCacheTtl,
+    int maxResultWindow = kNewsMaxResultWindow,
     Clock? clock,
   }) : _remote = remote,
        _local = local,
        _country = country,
        _pageSize = pageSize,
        _ttl = ttl,
+       _maxResultWindow = maxResultWindow,
        _clock = clock ?? const Clock();
 
   static const String defaultCountry = 'us';
@@ -60,6 +71,7 @@ class NewsRepositoryImpl implements NewsRepository {
   final String _country;
   final int _pageSize;
   final Duration _ttl;
+  final int _maxResultWindow;
   final Clock _clock;
 
   @override
@@ -103,9 +115,10 @@ class NewsRepositoryImpl implements NewsRepository {
         ).where((Article a) => !seen.contains(a.url)),
       );
 
-      // hasMore is derived from the raw total, not the filtered list, so
-      // discarding invalid records cannot make pagination stop early.
-      final bool hasMore = page * _pageSize < dto.totalResults;
+      // Derived from the raw total, not the filtered list, so discarding
+      // invalid records cannot make pagination stop early — and capped at the
+      // plan's result window, so it cannot offer a page the API will refuse.
+      final bool hasMore = _hasMore(page: page, total: dto.totalResults);
 
       await _tryWritePage(
         key: key,
@@ -148,6 +161,7 @@ class NewsRepositoryImpl implements NewsRepository {
   Future<ArticleFeed> searchArticles({
     required String query,
     int page = 1,
+    SearchSort sort = SearchSort.fallback,
   }) async {
     final String trimmed = query.trim();
     if (trimmed.isEmpty) {
@@ -165,12 +179,13 @@ class NewsRepositoryImpl implements NewsRepository {
         query: trimmed,
         page: page,
         pageSize: _pageSize,
+        sortBy: sort.apiValue,
       );
 
       return ArticleFeed(
         articles: ArticleMapper.toEntities(dto.articles),
         page: page,
-        hasMore: page * _pageSize < dto.totalResults,
+        hasMore: _hasMore(page: page, total: dto.totalResults),
         totalResults: dto.totalResults,
         origin: DataOrigin.network,
         fetchedAt: _clock.now().toUtc(),
@@ -198,6 +213,12 @@ class NewsRepositoryImpl implements NewsRepository {
     } on Object catch (error) {
       throw CacheFailure(debugMessage: error.toString());
     }
+  }
+
+  /// Whether a further page exists *and* is allowed by the plan.
+  bool _hasMore({required int page, required int total}) {
+    final int reachable = total < _maxResultWindow ? total : _maxResultWindow;
+    return page * _pageSize < reachable;
   }
 
   bool _isFresh(DateTime fetchedAt) =>

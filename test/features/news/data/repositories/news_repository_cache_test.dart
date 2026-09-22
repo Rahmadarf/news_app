@@ -319,4 +319,78 @@ void main() {
       expect(afterClear.origin, DataOrigin.network);
     });
   });
+
+  group('plan result window', () {
+    test('stops offering pages past the plan limit', () async {
+      // NewsAPI reports thousands of matches but refuses to serve past the
+      // hundredth result; believing totalResults would offer a page that is
+      // guaranteed to fail with HTTP 426.
+      final AppDatabase db = newTestDatabase();
+      final MutableClock clock = MutableClock(t0);
+      final NewsRepositoryImpl repository = NewsRepositoryImpl(
+        remote: FakeNewsRemoteDataSource(
+          totalResults: 5000,
+          articlesPerPage: 20,
+          uniquePerPage: true,
+        ),
+        local: NewsLocalDataSource(db),
+        pageSize: 20,
+        maxResultWindow: 100,
+        clock: clock.clock,
+      );
+
+      final ArticleFeed page4 = await repository.getTopHeadlines(
+        category: NewsCategory.general,
+        page: 4,
+      );
+      final ArticleFeed page5 = await repository.getTopHeadlines(
+        category: NewsCategory.general,
+        page: 5,
+      );
+
+      expect(page4.hasMore, isTrue, reason: '80 of 100 consumed');
+      expect(page5.hasMore, isFalse, reason: '100 of 100 consumed');
+      expect(page5.totalResults, 5000, reason: 'the real match count is kept');
+    });
+
+    test('a smaller total still ends pagination before the window', () async {
+      final NewsRepositoryImpl repository = NewsRepositoryImpl(
+        remote: FakeNewsRemoteDataSource(
+          totalResults: 30,
+          articlesPerPage: 20,
+          uniquePerPage: true,
+        ),
+        local: NewsLocalDataSource(newTestDatabase()),
+        pageSize: 20,
+        maxResultWindow: 100,
+      );
+
+      final ArticleFeed page2 = await repository.getTopHeadlines(
+        category: NewsCategory.general,
+        page: 2,
+      );
+
+      expect(page2.hasMore, isFalse);
+    });
+
+    test('the window also caps search pagination', () async {
+      final NewsRepositoryImpl repository = NewsRepositoryImpl(
+        remote: FakeNewsRemoteDataSource(
+          totalResults: 5000,
+          articlesPerPage: 20,
+          uniquePerPage: true,
+        ),
+        local: NewsLocalDataSource(newTestDatabase()),
+        pageSize: 20,
+        maxResultWindow: 100,
+      );
+
+      final ArticleFeed page5 = await repository.searchArticles(
+        query: 'kota',
+        page: 5,
+      );
+
+      expect(page5.hasMore, isFalse);
+    });
+  });
 }

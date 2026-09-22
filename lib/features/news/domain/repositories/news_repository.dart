@@ -1,6 +1,7 @@
 import 'package:news_app/features/news/domain/entities/article.dart';
 import 'package:news_app/features/news/domain/entities/article_feed.dart';
 import 'package:news_app/features/news/domain/entities/news_category.dart';
+import 'package:news_app/features/search/domain/entities/search_sort.dart';
 
 /// The only news contract presentation code depends on.
 ///
@@ -26,7 +27,11 @@ abstract interface class NewsRepository {
   /// One page of search results for [query]. [page] is 1-based.
   ///
   /// Search results are not cached, so this always reaches the active source.
-  Future<ArticleFeed> searchArticles({required String query, int page});
+  Future<ArticleFeed> searchArticles({
+    required String query,
+    int page,
+    SearchSort sort,
+  });
 
   /// The stored article for a canonical [url], or `null` when it was never
   /// cached. Backs screens reached by deep link, where no object was passed.

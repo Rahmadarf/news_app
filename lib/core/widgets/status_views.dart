@@ -1,149 +1,177 @@
 import 'package:flutter/material.dart';
 import 'package:news_app/core/errors/failure.dart';
-import 'package:news_app/core/theme/app_colors.dart';
+import 'package:news_app/core/theme/newsline_tokens.dart';
+import 'package:news_app/l10n/app_localizations.dart';
 
-/// Turns a typed [Failure] into user-facing copy.
+/// Turns a typed [Failure] into localized, user-facing copy.
 ///
-/// Wording lives in presentation, not in the data layer, so localization can
-/// replace it later without touching repositories.
-({String title, String message}) describeFailure(Failure failure) {
+/// Wording lives in presentation, not in the data layer, so repositories stay
+/// free of UI strings.
+({String title, String message}) describeFailure(
+  AppLocalizations l10n,
+  Failure failure,
+) {
   return switch (failure) {
     ConfigurationFailure() => (
-      title: 'App is not configured',
-      message: 'This build is missing its news configuration.',
+      title: l10n.errorConfigurationTitle,
+      message: l10n.errorConfigurationBody,
     ),
     NoConnectionFailure() => (
-      title: 'No connection',
-      message: 'Check your internet connection and try again.',
+      title: l10n.errorNoConnectionTitle,
+      message: l10n.errorNoConnectionBody,
     ),
     TimeoutFailure() => (
-      title: 'Request timed out',
-      message: 'The server took too long to respond.',
+      title: l10n.errorTimeoutTitle,
+      message: l10n.errorTimeoutBody,
     ),
     UnauthorizedFailure() => (
-      title: 'Access denied',
-      message: 'The news service rejected this app\'s credentials.',
+      title: l10n.errorUnauthorizedTitle,
+      message: l10n.errorUnauthorizedBody,
     ),
     RateLimitedFailure() => (
-      title: 'Too many requests',
-      message: 'The news service is rate limiting us. Try again later.',
+      title: l10n.errorRateLimitedTitle,
+      message: l10n.errorRateLimitedBody,
     ),
     UpgradeRequiredFailure() => (
-      title: 'Not available on this plan',
-      message: 'The news service does not allow this request.',
+      title: l10n.errorUpgradeRequiredTitle,
+      message: l10n.errorUpgradeRequiredBody,
     ),
     ServerFailure() => (
-      title: 'Service unavailable',
-      message: 'The news service is having trouble. Try again later.',
+      title: l10n.errorServerTitle,
+      message: l10n.errorServerBody,
     ),
     MalformedResponseFailure() => (
-      title: 'Unexpected response',
-      message: 'The news service sent something we could not read.',
+      title: l10n.errorMalformedTitle,
+      message: l10n.errorMalformedBody,
     ),
     CacheFailure() => (
-      title: 'Storage problem',
-      message: 'Saved articles could not be read.',
+      title: l10n.errorCacheTitle,
+      message: l10n.errorCacheBody,
     ),
     UnknownFailure() => (
-      title: 'Something went wrong',
-      message: 'Please try again.',
+      title: l10n.errorUnknownTitle,
+      message: l10n.errorUnknownBody,
     ),
   };
 }
 
-/// Full-screen failure state with a retry affordance.
-class FailureView extends StatelessWidget {
-  const FailureView({super.key, required this.failure, this.onRetry});
+/// Centred icon, headline, body, and a single recovery action.
+///
+/// Used for every empty and error condition so they stay visually identical,
+/// as the prototype's shared `.state` block does.
+class StatusView extends StatelessWidget {
+  const StatusView({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.message,
+    this.actionLabel,
+    this.onAction,
+  });
 
-  final Failure failure;
-  final VoidCallback? onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    final ({String title, String message}) copy = describeFailure(failure);
-
-    return _CenteredMessage(
-      icon: Icons.error_outline,
-      iconColor: AppColors.error,
+  /// Error variant, with copy derived from [failure].
+  factory StatusView.failure({
+    Key? key,
+    required AppLocalizations l10n,
+    required Failure failure,
+    VoidCallback? onRetry,
+  }) {
+    final ({String title, String message}) copy = describeFailure(
+      l10n,
+      failure,
+    );
+    return StatusView(
+      key: key,
+      icon: failure is NoConnectionFailure
+          ? Icons.cloud_off_outlined
+          : Icons.error_outline,
       title: copy.title,
       message: copy.message,
-      action: onRetry == null
-          ? null
-          : ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
+      actionLabel: onRetry == null ? null : l10n.retryAction,
+      onAction: onRetry,
     );
   }
-}
 
-/// Full-screen empty state.
-class EmptyView extends StatelessWidget {
-  const EmptyView({
-    super.key,
-    required this.title,
-    required this.message,
-    this.icon = Icons.newspaper,
-  });
-
+  final IconData icon;
   final String title;
   final String message;
-  final IconData icon;
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
-    return _CenteredMessage(
-      icon: icon,
-      iconColor: AppColors.textHint,
-      title: title,
-      message: message,
-    );
-  }
-}
+    final NewslineTokens tokens = NewslineTokens.of(context);
+    final TextTheme text = Theme.of(context).textTheme;
 
-class _CenteredMessage extends StatelessWidget {
-  const _CenteredMessage({
-    required this.icon,
-    required this.iconColor,
-    required this.title,
-    required this.message,
-    this.action,
-  });
-
-  final IconData icon;
-  final Color iconColor;
-  final String title;
-  final String message;
-  final Widget? action;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Icon(icon, size: 64, color: iconColor),
-            const SizedBox(height: 16),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: Spacing.gutter,
+        vertical: 48,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            width: 74,
+            height: 74,
+            decoration: BoxDecoration(
+              color: tokens.tintedSurface,
+              shape: BoxShape.circle,
             ),
-            const SizedBox(height: 8),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.textSecondary),
-            ),
-            if (action != null) ...<Widget>[
-              const SizedBox(height: 24),
-              action!,
-            ],
+            child: Icon(icon, size: 32, color: tokens.accent),
+          ),
+          const SizedBox(height: Spacing.xl),
+          Text(title, style: text.headlineMedium, textAlign: TextAlign.center),
+          const SizedBox(height: Spacing.sm),
+          Text(message, style: text.bodySmall, textAlign: TextAlign.center),
+          if (actionLabel != null && onAction != null) ...<Widget>[
+            const SizedBox(height: Spacing.xl),
+            ElevatedButton(onPressed: onAction, child: Text(actionLabel!)),
           ],
-        ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Accent-tinted strip shown above stale content while offline.
+class OfflineBanner extends StatelessWidget {
+  const OfflineBanner({super.key, this.updatedLabel});
+
+  /// Optional `updated <relative time>` suffix from the cached feed.
+  final String? updatedLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    final NewslineTokens tokens = NewslineTokens.of(context);
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: Spacing.md),
+      padding: const EdgeInsets.symmetric(
+        horizontal: Spacing.md,
+        vertical: Spacing.md,
+      ),
+      decoration: BoxDecoration(
+        color: tokens.tintedSurface,
+        borderRadius: BorderRadius.circular(Radii.thumbnail),
+      ),
+      child: Row(
+        children: <Widget>[
+          Icon(Icons.cloud_off_outlined, size: 16, color: tokens.accent),
+          const SizedBox(width: Spacing.sm),
+          Expanded(
+            child: Text(
+              updatedLabel == null
+                  ? l10n.offlineBanner
+                  : '${l10n.offlineBanner} · $updatedLabel',
+              style: Theme.of(
+                context,
+              ).textTheme.labelSmall?.copyWith(color: tokens.accent),
+            ),
+          ),
+        ],
       ),
     );
   }

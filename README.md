@@ -67,14 +67,43 @@ startup, dan bukan HTTP 401 yang menyamar sebagai kegagalan jaringan.
 
 ### Menyimpan flag agar tidak perlu diketik ulang
 
-Simpan di konfigurasi launch IDE Anda, atau gunakan file define yang tidak
-di-commit:
+Salin templatnya, isi kunci Anda, lalu jalankan dengan file itu:
+
+```bash
+cp dart_defines.example.json dart_defines.local.json
+```
+
+Ganti `GANTI_DENGAN_KUNCI_ANDA` di file tersebut dengan kunci NewsAPI Anda,
+kemudian:
 
 ```bash
 flutter run --dart-define-from-file=dart_defines.local.json
 ```
 
-Tambahkan `dart_defines.local.json` ke `.gitignore` Anda jika memakai cara ini.
+`dart_defines.local.json` sudah ada di `.gitignore`, jadi kunci Anda nol
+kemungkinan ikut ter-commit. Isi file itu tidak pernah dibaca oleh proses
+pengembangan ini.
+
+### Batasan plan NewsAPI yang memengaruhi perilaku aplikasi
+
+| Batas | Perilaku aplikasi |
+|---|---|
+| 100 hasil per query (plan Developer) | Paginasi berhenti di hasil ke-100 meskipun `totalResults` melaporkan ribuan. Melanjutkan akan dijawab HTTP 426. Diatur lewat `maxResultWindow` pada `NewsRepositoryImpl` — naikkan jika plan Anda mengizinkan |
+| Kuota harian | Cache TTL 15 menit menahan permintaan berulang. `429` di-retry dengan backoff, lalu muncul sebagai "Terlalu banyak permintaan" |
+| Diblokir di produksi | Mode mock ada untuk pengembangan dan demo; proxy backend adalah jalan untuk produksi |
+| CORS di browser | Web praktis memerlukan mode mock atau proxy |
+
+### Ketahanan permintaan
+
+Satu deadline 15 detik per percobaan. `429`, `5xx`, dan kegagalan transport
+di-retry paling banyak tiga percobaan dengan backoff eksponensial, menghormati
+`Retry-After` bila layanan mengirimnya dan meng-clamp-nya di 8 detik. Kunci
+yang ditolak, batas plan, dan permintaan cacat **tidak** di-retry — mengulangi
+itu hanya membakar kuota dan menunda error yang perlu dilihat pembaca.
+
+Pada build debug ada jejak permintaan yang mencatat path dan **nama** parameter
+saja, bukan nilainya dan bukan header — jadi kunci nol kemungkinan masuk ke
+baris log. Senyap di release.
 
 ## Keamanan API key — baca ini
 

@@ -157,22 +157,42 @@ class NewsLocalDataSource {
     });
   }
 
-  /// Drops all cached feeds and every article that is not bookmarked.
+  /// Drops all cached feeds, keeping any article the reader still has a claim
+  /// on.
   ///
-  /// Bookmarked articles survive on purpose: clearing a cache must not silently
-  /// delete something the user saved.
+  /// An article survives when it is bookmarked or present in reading history.
+  /// Clearing a cache must not silently delete something the reader saved, and
+  /// it must not erase what they have read: both tables reference
+  /// `cached_articles` with ON DELETE CASCADE, so deleting the row would take
+  /// the entry with it.
   Future<void> clearAll() {
     return _db.transaction(() async {
       await _db.delete(_db.feedEntries).go();
       await _db.delete(_db.feedPageMetadata).go();
       await (_db.delete(_db.cachedArticles)..where(
-            (CachedArticles t) => notExistsQuery(
-              _db.select(_db.bookmarks)
-                ..where((Bookmarks b) => b.articleUrl.equalsExp(t.url)),
-            ),
+            (CachedArticles t) =>
+                notExistsQuery(
+                  _db.select(_db.bookmarks)
+                    ..where((Bookmarks b) => b.articleUrl.equalsExp(t.url)),
+                ) &
+                notExistsQuery(
+                  _db.select(_db.readingHistoryEntries)..where(
+                    (ReadingHistoryEntries h) => h.articleUrl.equalsExp(t.url),
+                  ),
+                ),
           ))
           .go();
     });
+  }
+
+  /// Stores or refreshes a single article outside any feed page.
+  ///
+  /// Used when an article must outlive the feed cache — a bookmark, for
+  /// instance — without belonging to a cached page.
+  Future<void> upsertArticle(Article article) {
+    return _db
+        .into(_db.cachedArticles)
+        .insertOnConflictUpdate(_toCompanion(article));
   }
 
   /// Looks one article up by canonical URL. Backs the article screen when it

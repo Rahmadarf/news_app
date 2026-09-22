@@ -45,3 +45,7 @@ app.*.map.json
 /android/app/release
 
 assets/.env
+
+# Konfigurasi define lokal. Berisi kunci NewsAPI, jadi jangan pernah di-commit.
+# Salin dari dart_defines.example.json.
+dart_defines.local.json
