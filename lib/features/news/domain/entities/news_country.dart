@@ -21,7 +21,13 @@ enum NewsCountry {
   /// not part of the translated catalogue.
   final String label;
 
-  static const NewsCountry fallback = NewsCountry.indonesia;
+  /// Default edition.
+  ///
+  /// Deliberately not Indonesia, even though the product is Indonesian:
+  /// NewsAPI's `/top-headlines` coverage for `country=id` is thin to empty, so
+  /// defaulting to it hands a new reader a blank feed. Indonesia stays
+  /// selectable in Settings, and search over `/everything` is unaffected.
+  static const NewsCountry fallback = NewsCountry.unitedStates;
 
   /// Returns [fallback] rather than throwing, so a stale persisted value
   /// cannot break start-up.

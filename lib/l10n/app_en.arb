@@ -174,5 +174,17 @@
         "type": "String"
       }
     }
+  },
+  "emptyFeedBodyEdition": "The news service returned no headlines for {edition} · {category}. Try another category, or change the edition.",
+  "changeEditionAction": "Change edition",
+  "@emptyFeedBodyEdition": {
+    "placeholders": {
+      "edition": {
+        "type": "String"
+      },
+      "category": {
+        "type": "String"
+      }
+    }
   }
 }

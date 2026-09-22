@@ -425,4 +425,12 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get aboutNewsline =>
       'Newsline adalah build referensi desain. Konten editorial pada mode mock adalah data contoh dan nol klaim atas peristiwa terkini.';
+
+  @override
+  String emptyFeedBodyEdition(String edition, String category) {
+    return 'Layanan berita tidak mengembalikan headline untuk $edition · $category. Coba kategori lain, atau ganti edisinya.';
+  }
+
+  @override
+  String get changeEditionAction => 'Ganti edisi';
 }

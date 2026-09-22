@@ -146,9 +146,20 @@ class NewsApiDataSource implements NewsRemoteDataSource {
         .timeout(_timeout);
 
     _lastRetryAfter = _parseRetryAfter(response.headers['retry-after']);
-    _log(uri, 'HTTP ${response.statusCode} (attempt $attempt)');
 
     final NewsResponseDto? body = _decode(response.body);
+
+    // The result count is the single most useful thing when a live feed comes
+    // back empty: it separates "the service returned nothing" from "we dropped
+    // everything during mapping".
+    _log(
+      uri,
+      'HTTP ${response.statusCode} · '
+      '${body == null ? 'unreadable body' : '${body.totalResults} results, '
+                '${body.articles.length} on this page'}'
+      '${body?.code == null ? '' : ' · code=${body!.code}'} '
+      '(attempt $attempt)',
+    );
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw NewsApiException(

@@ -168,9 +168,15 @@ class _Feed extends ConsumerWidget {
             child: StatusView(
               icon: Icons.newspaper_outlined,
               title: l10n.emptyFeedTitle,
-              message: l10n.emptyFeedBody,
-              actionLabel: l10n.retryAction,
-              onAction: controller.refresh,
+              // Names what produced the empty result. An edition with no
+              // NewsAPI coverage is the usual cause, and "try again" would be
+              // useless advice for it.
+              message: l10n.emptyFeedBodyEdition(
+                ref.watch(selectedCountryProvider).label,
+                categoryLabel(l10n, category),
+              ),
+              actionLabel: l10n.changeEditionAction,
+              onAction: () => context.go(AppRoutes.settingsPath),
             ),
           )
         else

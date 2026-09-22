@@ -425,4 +425,12 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get aboutNewsline =>
       'Newsline is a design reference build. Editorial content in mock mode is sample data and makes no claim about current events.';
+
+  @override
+  String emptyFeedBodyEdition(String edition, String category) {
+    return 'The news service returned no headlines for $edition · $category. Try another category, or change the edition.';
+  }
+
+  @override
+  String get changeEditionAction => 'Change edition';
 }

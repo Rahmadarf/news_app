@@ -865,6 +865,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Newsline is a design reference build. Editorial content in mock mode is sample data and makes no claim about current events.'**
   String get aboutNewsline;
+
+  /// No description provided for @emptyFeedBodyEdition.
+  ///
+  /// In en, this message translates to:
+  /// **'The news service returned no headlines for {edition} · {category}. Try another category, or change the edition.'**
+  String emptyFeedBodyEdition(String edition, String category);
+
+  /// No description provided for @changeEditionAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Change edition'**
+  String get changeEditionAction;
 }
 
 class _AppLocalizationsDelegate

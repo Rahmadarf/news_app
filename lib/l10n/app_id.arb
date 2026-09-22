@@ -127,5 +127,7 @@
   "clearCacheConfirmBody": "Cache feed akan dihapus. Artikel tersimpan dan riwayat baca tetap disimpan.",
   "clearCacheDone": "Cache berita dihapus",
   "openSourceLicenses": "Lisensi sumber terbuka",
-  "aboutNewsline": "Newsline adalah build referensi desain. Konten editorial pada mode mock adalah data contoh dan nol klaim atas peristiwa terkini."
+  "aboutNewsline": "Newsline adalah build referensi desain. Konten editorial pada mode mock adalah data contoh dan nol klaim atas peristiwa terkini.",
+  "emptyFeedBodyEdition": "Layanan berita tidak mengembalikan headline untuk {edition} · {category}. Coba kategori lain, atau ganti edisinya.",
+  "changeEditionAction": "Ganti edisi"
 }

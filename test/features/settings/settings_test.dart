@@ -98,10 +98,17 @@ void main() {
   });
 
   group('edition', () {
-    test('defaults to the documented fallback', () async {
+    test('defaults to an edition NewsAPI actually serves', () async {
       final ProviderContainer container = await containerWith();
 
       expect(container.read(selectedCountryProvider), NewsCountry.fallback);
+      expect(
+        NewsCountry.fallback,
+        isNot(NewsCountry.indonesia),
+        reason:
+            'NewsAPI top-headlines coverage for country=id is thin to empty, '
+            'so defaulting to it hands a new reader a blank feed',
+      );
     });
 
     test('an unknown stored code falls back rather than throwing', () async {
