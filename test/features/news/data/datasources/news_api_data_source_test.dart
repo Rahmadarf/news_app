@@ -137,7 +137,7 @@ void main() {
     );
   });
 
-  test('times out when the client never responds', () {
+  test('applies its deadline to a single attempt', () {
     fakeAsync((FakeAsync async) {
       final NewsApiDataSource source = NewsApiDataSource(
         apiKey: 'test-key',
@@ -145,6 +145,8 @@ void main() {
           (http.Request request) => Completer<http.Response>().future,
         ),
         timeout: const Duration(seconds: 5),
+        // Retry disabled so the deadline itself is what surfaces.
+        retryPolicy: RetryPolicy.none,
       );
 
       Object? caught;
@@ -169,5 +171,37 @@ void main() {
 
       expect(caught, isA<TimeoutException>());
     });
+  });
+
+  test('retries a timeout before giving up', () async {
+    final List<Duration> waits = <Duration>[];
+    int calls = 0;
+
+    final NewsApiDataSource source = NewsApiDataSource(
+      apiKey: 'test-key',
+      client: MockClient((http.Request request) async {
+        calls++;
+        if (calls == 1) throw TimeoutException('deadline exceeded');
+        return http.Response(
+          json.encode(<String, dynamic>{
+            'status': 'ok',
+            'totalResults': 0,
+            'articles': <dynamic>[],
+          }),
+          200,
+        );
+      }),
+      sleep: (Duration duration) async => waits.add(duration),
+    );
+
+    await source.fetchTopHeadlines(
+      country: 'us',
+      category: 'general',
+      page: 1,
+      pageSize: 20,
+    );
+
+    expect(calls, 2);
+    expect(waits, hasLength(1));
   });
 }
